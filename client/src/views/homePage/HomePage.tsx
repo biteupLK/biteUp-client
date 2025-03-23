@@ -15,7 +15,6 @@ import {
   IconButton,
   TextField,
   InputAdornment,
-  Avatar,
   Chip,
   Paper,
   Badge,
@@ -43,7 +42,7 @@ const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
   const [tabValue, setTabValue] = useState(0);
   
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
   
