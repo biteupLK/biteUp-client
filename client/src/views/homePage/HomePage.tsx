@@ -37,6 +37,12 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import burger from '../../assets/burger.jpg'
+import pizza from '../../assets/pizza.jpg'
+import noodles from '../../assets/noodles.jpg'
+import kottu from '../../assets/kottu.jpg'
+import food from '../../assets/food.jpg'
+import screen from '../../assets/screen.jpg'
 
 const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
@@ -60,7 +66,7 @@ const Home: React.FC = () => {
       name: "Burger Joint",
       rating: 4.8,
       time: "20-30 min",
-      image: "/public/burger.jpg",
+      image: burger,
       tags: ["Burgers", "American"],
       promotion: "20% OFF",
       featured: true
@@ -69,14 +75,14 @@ const Home: React.FC = () => {
       name: "Pizza Plaza",
       rating: 4.7,
       time: "25-35 min",
-      image: "/public/pizza.jpg",
+      image: pizza,
       tags: ["Pizza", "Italian"]
     },
     {
       name: "Noodle House",
       rating: 4.9,
       time: "15-25 min",
-      image: "/public/pizza.jpg",
+      image: noodles,
       tags: ["Asian", "Noodles"],
       promotion: "Free Delivery"
     },
@@ -84,7 +90,7 @@ const Home: React.FC = () => {
       name: "Green Garden",
       rating: 4.6,
       time: "20-30 min",
-      image: "/public/kottu.jpg",
+      image: kottu,
       tags: ["Healthy", "Salads"]
     }
   ];
@@ -93,12 +99,12 @@ const Home: React.FC = () => {
     {
       title: "30% OFF First Order",
       description: "Use code WELCOME30",
-      image: "/public/food.jpg"
+      image: food
     },
     {
       title: "Free Delivery Weekend",
       description: "No minimum order",
-      image: "/public/kottu.jpg"
+      image: kottu
     }
   ];
   
@@ -492,7 +498,7 @@ const Home: React.FC = () => {
               <Grid item xs={12} md={5} sx={{ display: { xs: 'none', md: 'block' }, position: 'relative' }}>
                 <Box 
                   component="img"
-                  src="/public/screen.jpg"
+                  src={screen}
                   alt="Mobile app screenshot"
                   sx={{ 
                     width: '110%', 
