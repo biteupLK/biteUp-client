@@ -1,8 +1,8 @@
 /* root styles */
 :root {
-  --primary-color: #ff6b6b;
-  --secondary-color: #f9f871;
-  --tertiary-color: #f9f871;
+  --primary-color: #D46F12;
+  --secondary-color: #8EC976;
+  --tertiary-color: #717171;
   --dark-color: #333;
   --light-color: #f4f4f4;
   --white-color: #fff;
@@ -12,7 +12,7 @@
   --font-color-dark: #333;
   --font-color-white: #fff;
   --font-color-black: #000;
-  --font-family: "Poppins", sans-serif;
+  --font-family: "Arial Rounded MT Bold", "Poppins", sans-serif;
   --font-size: 1rem;
   --font-weight: 400;
   --line-height: 1.5;
