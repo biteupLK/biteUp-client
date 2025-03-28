@@ -18,6 +18,7 @@ import {
   Divider,
   Tabs,
   Tab,
+  Stack,
 } from "@mui/material";
 
 import RestaurantIcon from "@mui/icons-material/Restaurant";
@@ -32,7 +33,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-
+import { motion } from "framer-motion";
 
 import burger from "../../assets/burger.jpg";
 import pizza from "../../assets/pizza.jpg";
@@ -42,7 +43,8 @@ import food from "../../assets/food.jpg";
 import screen from "../../assets/screen.jpg";
 import Navbar from "../../components/layOuts/Navbar";
 
-
+//images
+import bikerider from "../../assets/homepage/bikerider.png";
 
 const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
@@ -91,7 +93,7 @@ const Home: React.FC = () => {
       rating: 4.6,
       time: "20-30 min",
       image: kottu,
-      tags: ["Healthy", "Salads"],
+      tags: ["Helthy", "Salads"],
     },
   ];
 
@@ -112,9 +114,138 @@ const Home: React.FC = () => {
     <ThemeProvider theme={theme}>
       <Box sx={{ flexGrow: 1, bgcolor: "white", minHeight: "100vh" }}>
         {/* App Bar */}
-        <Navbar/>
+        <Navbar />
 
-        
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            height: "90vh",
+            py: 4,
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={4}
+            alignItems="center"
+            justifyContent="space-between"
+            width="100%"
+          >
+            {/* Text Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+              }}
+              style={{
+                maxWidth: 550,
+                textAlign: isMobile ? "center" : "left",
+                width: isMobile ? "100%" : "auto",
+              }}
+            >
+              <Typography
+                variant="h3"
+                component="h3"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary",
+                  fontSize: isMobile ? "3rem" : "h2.fontSize",
+                }}
+              >
+                Fastest <br />
+                <Box component="span" sx={{ color: "orange" }}>
+                  Delivery
+                </Box>{" "}
+                &, <br />
+                Easy{" "}
+                <Box component="span" sx={{ color: "orange" }}>
+                  Pickup
+                </Box>
+                .
+              </Typography>
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{
+                  mb: 10,
+                  mt: 5,
+                  justifyContent: { xs: "center", md: "flex-start" },
+                }}
+              >
+                {["Order Now", "Check Process"].map((text, index) => (
+                  <motion.button
+                    key={text}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      padding: "12px 24px",
+                      borderRadius: 8,
+                      backgroundColor: index === 0 ? "black" : "transparent",
+                      color: index === 0 ? "white" : "gray",
+                      border: index === 0 ? "none" : "1px solid gray",
+                      width: isMobile ? "100%" : "auto",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {text}
+                  </motion.button>
+                ))}
+              </Stack>
+            </motion.div>
+
+            {/* Image Section with Motion Effects */}
+            <Box
+              sx={{
+                position: "relative",
+                maxWidth: 500,
+                width: "100%",
+                display: { xs: "none", md: "flex" },
+                justifyContent: "center",
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.6,
+                  ease: "easeOut",
+                }}
+              >
+
+              <motion.div
+                initial={{ opacity: 1, scale: 1 }}
+                animate={{
+                  opacity: isMobile ? 0 : 1,
+                  scale: isMobile ? 0.8 : 1,
+                }}
+                transition={{
+                  duration: 0.5,
+                  ease: "easeInOut",
+                }}
+              >
+                <Box
+                  component="img"
+                  src={bikerider}
+                  alt="Delivery Person"
+                  sx={{
+                    maxHeight: 500,
+                    mt: 5,
+                    width: "auto",
+                    objectFit: "contain",
+                  }}
+                />
+              </motion.div>
+              </motion.div>
+            </Box>
+          </Stack>
+        </Container>
 
         {/* Main Content */}
         <Container sx={{ py: 4 }}>
