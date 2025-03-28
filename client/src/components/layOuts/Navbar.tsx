@@ -15,14 +15,13 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
 // Navbar Icons
 import HomeIcon from "@mui/icons-material/Home";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { IoFastFood } from "react-icons/io5";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LoginIcon from "@mui/icons-material/Login";
 import { FaCartShopping } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
@@ -49,7 +48,6 @@ const Navbar: React.FC = () => {
   const [activePage, setActivePage] = useState("Home");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Update active page based on current route
@@ -64,10 +62,14 @@ const Navbar: React.FC = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  // Updated handleNavigation to refresh the page
   const handleNavigation = (path: string, page: string) => {
-    navigate(path);
     setActivePage(page);
-    setMobileOpen(false);
+    if (location.pathname === path) {
+      window.location.reload(); // Refreshes only if already on the same page
+    } else {
+      window.location.href = path; // Forces page reload by setting the URL directly
+    }
   };
 
   const navItems = [
