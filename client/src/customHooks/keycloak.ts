@@ -19,7 +19,6 @@ const useAuth = () => {
         // Determine authentication mode based on the current path
         const authMode = location.pathname === "/" ? "check-sso" : "login-required";
 
-        // Initialize Keycloak only once
         if (!keycloakInitPromise) {
             keycloakInitPromise = keycloakInstance.init({
                 onLoad: authMode,
@@ -29,16 +28,36 @@ const useAuth = () => {
             keycloakInitPromise
                 .then((authenticated) => {
                     setLogin(authenticated);
+                    
+                    if (authenticated) {
+                        // Store the access token in localStorage
+                        localStorage.setItem("access_token", keycloakInstance.token || "");
+                        console.log("Access Token Stored:", keycloakInstance.token);
+                    } else {
+                        localStorage.removeItem("access_token");
+                    }
+
                     console.log("Auth Status Updated:", authenticated);
                 })
                 .catch((err) => {
                     console.error("Keycloak initialization failed", err);
                     setLogin(false);
+                    localStorage.removeItem("access_token");
                 });
         }
     }, []);
 
-    return isLogin;
+    const handleLogout = () => {
+        keycloakInstance.logout({
+            redirectUri: window.location.origin, // Redirect after logout
+        });
+        localStorage.removeItem("access_token"); // Clear stored token
+    };
+
+    return { isLogin, handleLogout }
 };
+
+
+
 
 export default useAuth;
