@@ -25,9 +25,11 @@ import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
 import { FaCartShopping } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
+import useAuth from "../../customHooks/keycloak";
 
 // Import your logo here
 import logo from "../../assets/logo/biteUpLogo.png";
+import getUserDetails from "../../customHooks/extractPayload";
 
 // Create a context to manage active page
 interface NavContextType {
@@ -40,6 +42,7 @@ const NavContext = createContext<NavContextType>({
   setActivePage: () => {},
 });
 
+
 // Custom hook to use navigation context
 export const useNavContext = () => useContext(NavContext);
 
@@ -49,6 +52,9 @@ const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
+  const userDetails = getUserDetails();
+  const name = userDetails?.name; // Using optional chaining in case the return is null
+  const { isLogin, handleLogout } = useAuth();
 
   // Update active page based on current route
   React.useEffect(() => {
@@ -272,8 +278,9 @@ const Navbar: React.FC = () => {
                       borderRadius: 10,
                       p: 2,
                     }}
+                    onClick={handleLogout}
                   >
-                    Login / Signup
+                    Hi {name}
                   </Button>
                 </motion.div>
               </motion.div>

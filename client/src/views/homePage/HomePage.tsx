@@ -45,6 +45,8 @@ import Navbar from "../../components/layOuts/Navbar";
 
 //images
 import bikerider from "../../assets/homepage/bikerider.png";
+import { useQuery } from "@tanstack/react-query";
+import { fetchRestaurantData } from "../../api/restaurantApi";
 
 const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
@@ -53,6 +55,11 @@ const Home: React.FC = () => {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  const { data: restaurantData, isFetching: isAccidentDataFetching } = useQuery({
+    queryKey: ["accidents"],
+    queryFn: fetchRestaurantData,
+  });
 
   const foodCategories = [
     { name: "Pizza", icon: <LocalPizzaIcon /> },

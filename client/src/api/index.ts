@@ -8,6 +8,14 @@ axios.interceptors.request.use(
       config.headers = {} as AxiosRequestHeaders;
     }
 
+    // Retrieve token from localStorage
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`; // OAuth2 Bearer token
+      config.headers["Token"] = token; // Custom token header (if needed)
+    }
+
     console.log("Headers set", config.headers);
 
     config.validateStatus = (status: number) => status >= 200 && status < 300;
