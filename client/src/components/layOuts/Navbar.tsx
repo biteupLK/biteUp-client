@@ -25,6 +25,7 @@ import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
 import { FaCartShopping } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
+import { FaUserLarge } from "react-icons/fa6";
 import useAuth from "../../customHooks/keycloak";
 
 // Import your logo here
@@ -53,7 +54,8 @@ const Navbar: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
   const userDetails = getUserDetails();
-  const name = userDetails?.name; // Using optional chaining in case the return is null
+  const name = userDetails?.name;
+  const role = userDetails?.role;
   const { isLogin, handleLogout } = useAuth();
 
   // Update active page based on current route
@@ -62,6 +64,7 @@ const Navbar: React.FC = () => {
     if (path === "/") setActivePage("Home");
     else if (path === "/restaurant") setActivePage("Restaurant");
     else if (path === "/foods") setActivePage("Foods");
+    else if (path === "/profile") setActivePage("Profile");
   }, [location]);
 
   const handleDrawerToggle = () => {
@@ -82,6 +85,7 @@ const Navbar: React.FC = () => {
     { label: "Home", icon: <HomeIcon />, path: "/" },
     { label: "Restaurant", icon: <RestaurantIcon />, path: "/restaurant" },
     { label: "Foods", icon: <IoFastFood />, path: "/foods" },
+    { label: "Profile", icon: <FaUserLarge />, path: "/profile" },
   ];
 
   const renderNavButtons = () => (
@@ -280,7 +284,7 @@ const Navbar: React.FC = () => {
                     }}
                     onClick={handleLogout}
                   >
-                    Hi {name}
+                    Hi {name}/ {role}
                   </Button>
                 </motion.div>
               </motion.div>
