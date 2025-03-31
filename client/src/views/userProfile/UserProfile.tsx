@@ -6,73 +6,86 @@ import {
   profileSave,
   profileUpdate,
 } from "../../api/userApi";
-import useIsMobile from "../../customHooks/useIsMobile";
+//import useIsMobile from "../../customHooks/useIsMobile";
 import getUserDetails from "../../customHooks/extractPayload";
 import Navbar from "../../components/layOuts/Navbar";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import queryClient from "../../state/queryClient";
-import { FaBarsProgress } from "react-icons/fa6";
 
 export default function UserProfile() {
-  const isMobile = useIsMobile();
-  const userDetails = getUserDetails();
+  //const isMobile = useIsMobile();
+
+  const [userDetails, setUserDetails] = useState<any>(null);
+  useEffect(() => {
+    const details = getUserDetails();
+    setUserDetails(details);
+  }, []);
 
   const { data: userData, isFetching: isUserDataFetching } = useQuery({
     queryKey: ["users", userDetails?.email],
     queryFn: () => fetchUserByEmail(userDetails?.email),
-    enabled: !!userDetails?.email, // Ensure query runs only if email exists
+    enabled: !!userDetails?.email,
   });
-  const data = queryClient.getQueryData<UserSchema[]>(["users"]);
 
-  // Log the user data after it is fetched successfully
   useEffect(() => {
     if (userData) {
-      console.log(userData); // Log user data after it's fetched
+      console.log(userData);
     }
   }, [userData]);
 
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors },
-  } = useForm<UserSchema>({
-    defaultValues: {
-      firstName: userDetails?.name || "",
-      lastName: userDetails?.family_name || "",
-      email: userDetails?.email || "",
-      mobile: userData?.mobile || "", // Ensure this won't be undefined
-      address: userData?.address || "", // Ensure this won't be undefined
-    },
-  });
+  } = useForm<UserSchema>({});
 
-  const { mutate: profileSaveMutation, isRegisterPending } = useMutation({
-    mutationFn: profileSave,
-    onSuccess: (data) => {
-      enqueueSnackbar("Account Updated Successfully!", { variant: "success" });
-    },
-    onError: (error: any) => {
-      console.log(error);
-      enqueueSnackbar(error?.data?.message ?? `Account Update Failed`, {
-        variant: "error",
+  useEffect(() => {
+    if (userDetails && userData) {
+      reset({
+        firstName: userDetails?.name || "",
+        lastName: userDetails?.family_name || "",
+        email: userDetails?.email || "",
+        mobile: userData?.mobile || "",
+        address: userData?.address || "",
       });
-    },
-  });
+    }
+  }, [userDetails, userData, reset]);
 
-  const { mutate: profileUpdateMutation, isUpdatePending } = useMutation({
-    mutationFn: profileUpdate,
-    onSuccess: (data) => {
-      enqueueSnackbar("Account Updated Successfully!", { variant: "success" });
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-    },
-    onError: (error: any) => {
-      console.log(error);
-      enqueueSnackbar(error?.data?.message ?? `Account Update Failed`, {
-        variant: "error",
-      });
-    },
-  });
+  const { mutate: profileSaveMutation, isPending: isRegisterPending } =
+    useMutation({
+      mutationFn: profileSave,
+      onSuccess: () => {
+        enqueueSnackbar("Account Updated Successfully!", {
+          variant: "success",
+        });
+      },
+      onError: (error: any) => {
+        console.log(error);
+        enqueueSnackbar(error?.data?.message ?? `Account Update Failed`, {
+          variant: "error",
+        });
+      },
+    });
+
+  const { mutate: profileUpdateMutation, isPending: isUpdatePending } =
+    useMutation({
+      mutationFn: profileUpdate,
+      onSuccess: () => {
+        enqueueSnackbar("Account Updated Successfully!", {
+          variant: "success",
+        });
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+      },
+      onError: (error: any) => {
+        console.log(error);
+        enqueueSnackbar(error?.data?.message ?? `Account Update Failed`, {
+          variant: "error",
+        });
+      },
+    });
 
   const onRegistrationSubmit = (data: UserSchema) => {
     console.log(data);
@@ -103,7 +116,7 @@ export default function UserProfile() {
               required
               error={!!errors.firstName}
               helperText={errors.firstName?.message}
-              label="Email"
+            //   label="Email"
               fullWidth
               InputProps={{ readOnly: true }}
             />
@@ -115,13 +128,14 @@ export default function UserProfile() {
           rules={{ required: "First Name is required" }}
           render={({ field }) => (
             <TextField
-              {...field}
+              {...field} // Spread the field properties (including value)
               required
               error={!!errors.firstName}
+              value={field.value}
               helperText={errors.firstName?.message}
-              label="First Name"
+            //   label="First Name"
               fullWidth
-              InputProps={{ readOnly: true }}
+              InputProps={{ readOnly: true }} // Making the field read-only
             />
           )}
         />
@@ -136,7 +150,7 @@ export default function UserProfile() {
               required
               error={!!errors.lastName}
               helperText={errors.lastName?.message}
-              label="Last Name"
+            //   label="Last Name"
               fullWidth
               InputProps={{ readOnly: true }}
             />
@@ -240,7 +254,7 @@ export default function UserProfile() {
               variant="contained"
               color="primary"
               onClick={handleSubmit(onUpdateSubmit)}
-              disabled={isRegisterPending}
+              disabled={isUpdatePending}
             >
               {isRegisterPending ? <CircularProgress color="info" /> : "Update"}
             </Button>
