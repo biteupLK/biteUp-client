@@ -57,7 +57,7 @@ const Home: React.FC = () => {
   };
 
   const { data: restaurantData, isFetching: isAccidentDataFetching } = useQuery({
-    queryKey: ["accidents"],
+    queryKey: ["restaurant"],
     queryFn: fetchRestaurantData,
   });
 
@@ -118,7 +118,6 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <ThemeProvider theme={theme}>
       <Box sx={{ flexGrow: 1, bgcolor: "white", minHeight: "100vh" }}>
         {/* App Bar */}
         <Navbar />
@@ -279,7 +278,7 @@ const Home: React.FC = () => {
             >
               Delicious food, delivered{" "}
               <Box component="span" sx={{ color: "#FF4757" }}>
-                fast
+                fastB {restaurantData?.restaurantName}
               </Box>
             </Typography>
             <Typography
@@ -718,7 +717,6 @@ const Home: React.FC = () => {
           </Box>
         </Container>
       </Box>
-    </ThemeProvider>
   );
 };
 

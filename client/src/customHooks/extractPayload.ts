@@ -11,6 +11,7 @@ interface JwtPayload {
   realm_access?: {
     roles: string[];
   };
+  role?:string;
 }
 
 function getUserDetails(): Partial<JwtPayload> | null {
@@ -26,6 +27,7 @@ function getUserDetails(): Partial<JwtPayload> | null {
       given_name: payload.given_name,
       family_name: payload.family_name,
       email: payload.email,
+      role: payload.role
     };
   } catch (error) {
     console.error("Invalid JWT token", error);
