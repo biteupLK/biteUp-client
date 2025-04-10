@@ -9,6 +9,7 @@ import getUserDetails from "./customHooks/extractPayload";
 import Admin from "./views/adminPage/AdminPage";
 import PageLoader from "./components/PageLoader";
 import UserProfile from "./views/userProfile/UserProfile";
+import UserHome from "./views/homePage/UserHome";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
@@ -17,7 +18,7 @@ const AppRoutes = () => {
   const userDetails = getUserDetails();
   const role = userDetails?.role;
   return (
-    <Suspense fallback={<PageLoader/>}>
+    <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route
           path="/"
@@ -46,6 +47,10 @@ const AppRoutes = () => {
         <Route
           path="/profile"
           element={isLogin ? <UserProfile /> : <ErrorPage />}
+        />
+        <Route
+          path="/home"
+          element={isLogin ? <UserHome /> : <ErrorPage />}
         />
       </Routes>
     </Suspense>
