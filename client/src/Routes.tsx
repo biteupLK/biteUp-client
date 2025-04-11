@@ -9,6 +9,7 @@ import getUserDetails from "./customHooks/extractPayload";
 import Admin from "./views/adminPage/AdminPage";
 import PageLoader from "./components/PageLoader";
 import UserProfile from "./views/userProfile/UserProfile";
+import PaymentPage from "./views/paymentPage/PayementPage";
 import UserHome from "./views/homePage/UserHome";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
@@ -49,6 +50,8 @@ const AppRoutes = () => {
           element={isLogin ? <UserProfile /> : <ErrorPage />}
         />
         <Route
+          path="/payment"
+          element={isLogin ? <PaymentPage /> : <ErrorPage />}
           path="/home"
           element={isLogin ? <UserHome /> : <ErrorPage />}
         />
