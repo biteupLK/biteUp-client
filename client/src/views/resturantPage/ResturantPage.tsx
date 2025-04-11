@@ -1,6 +1,5 @@
 import React from 'react';
-
-import theme from "../../theme"; // Import your Poppins theme
+import theme from "../../theme";
 import Navbar from "../../components/layOuts/Navbar";
 import { Box, ThemeProvider } from '@mui/material';
 
