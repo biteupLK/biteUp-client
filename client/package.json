@@ -13,12 +13,13 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.8",
+    "@mui/joy": "^5.0.0-beta.52",
     "@mui/material": "^6.4.8",
     "@stripe/react-stripe-js": "^3.6.0",
     "@stripe/stripe-js": "^7.0.0",
     "@tanstack/react-query": "^5.70.0",
     "axios": "^1.8.4",
-    "framer-motion": "^12.5.0",
+    "framer-motion": "^12.6.3",
     "jwt-decode": "^4.0.0",
     "keycloak-js": "^26.1.4",
     "notistack": "^3.0.2",
@@ -40,6 +41,6 @@
     "globals": "^15.15.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "vite": "^6.2.2"
+    "vite": "^6.2.6"
   }
 }

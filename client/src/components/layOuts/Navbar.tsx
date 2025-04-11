@@ -14,8 +14,11 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
+  Typography,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Added useNavigate
 import { motion } from "framer-motion";
 
 // Navbar Icons
@@ -32,6 +35,8 @@ import useAuth from "../../customHooks/keycloak";
 import logo from "../../assets/logo/biteUpLogo.png";
 import getUserDetails from "../../customHooks/extractPayload";
 
+import NavigationButtons from "../NavigationButtons"; // Import your NavigationButtons component
+
 // Create a context to manage active page
 interface NavContextType {
   activePage: string;
@@ -43,20 +48,29 @@ const NavContext = createContext<NavContextType>({
   setActivePage: () => {},
 });
 
-
 // Custom hook to use navigation context
 export const useNavContext = () => useContext(NavContext);
 
 const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activePage, setActivePage] = useState("Home");
+  const [activePage, setActivePage] = useState('Home');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
+  const navigate = useNavigate(); // Add this line
   const userDetails = getUserDetails();
   const name = userDetails?.name;
   const role = userDetails?.role;
   const { isLogin, handleLogout } = useAuth();
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   // Update active page based on current route
   React.useEffect(() => {
@@ -64,8 +78,9 @@ const Navbar: React.FC = () => {
     if (path === "/") setActivePage("Home");
     else if (path === "/restaurant") setActivePage("Restaurant");
     else if (path === "/foods") setActivePage("Foods");
-    else if (path === "/profile") setActivePage("Profile");
   }, [location]);
+
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -74,60 +89,16 @@ const Navbar: React.FC = () => {
   // Updated handleNavigation to refresh the page
   const handleNavigation = (path: string, page: string) => {
     setActivePage(page);
-    if (location.pathname === path) {
-      window.location.reload(); // Refreshes only if already on the same page
-    } else {
-      window.location.href = path; // Forces page reload by setting the URL directly
-    }
+    navigate(path); // Changed to use navigate
   };
 
   const navItems = [
     { label: "Home", icon: <HomeIcon />, path: "/" },
     { label: "Restaurant", icon: <RestaurantIcon />, path: "/restaurant" },
     { label: "Foods", icon: <IoFastFood />, path: "/foods" },
-    { label: "Profile", icon: <FaUserLarge />, path: "/profile" },
   ];
 
-  const renderNavButtons = () => (
-    <NavContext.Provider value={{ activePage, setActivePage }}>
-      {navItems.map((item) => (
-        <motion.div
-          key={item.label}
-          initial={{ scale: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button
-            startIcon={item.icon}
-            onClick={() => handleNavigation(item.path, item.label)}
-            sx={{
-              mx: 1,
-              color: activePage === item.label ? "white" : "gray",
-              fontWeight: 500,
-              px: 3,
-              py: 1,
-              bgcolor: activePage === item.label ? "black" : "white",
-              borderRadius: 7,
-              display: "flex",
-              alignItems: "center",
-              border: activePage === item.label ? "none" : "1px solid gray",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                bgcolor:
-                  activePage === item.label
-                    ? "rgba(0,0,0,0.9)"
-                    : "rgba(0,0,0,0.1)",
-              },
-              ...(isMobile && { display: "none" }), // Hide on mobile
-            }}
-          >
-            {item.label}
-          </Button>
-        </motion.div>
-      ))}
-    </NavContext.Provider>
-  );
-
+  
   const mobileDrawer = (
     <Drawer
       variant="temporary"
@@ -157,16 +128,30 @@ const Navbar: React.FC = () => {
             </ListItemButton>
           </ListItem>
         ))}
+        {/* Add Profile to mobile drawer */}
         <ListItem disablePadding>
           <ListItemButton
-            onClick={() => {
-              /* Add login logic */
+            onClick={() => handleNavigation("/profile", "Profile")}
+            selected={activePage === "Profile"}
+            sx={{
+              transition: "all 0.3s ease",
+              "&.Mui-selected": {
+                backgroundColor: "rgba(0,0,0,0.1)",
+              },
             }}
           >
             <ListItemIcon>
+              <FaUserLarge />
+            </ListItemIcon>
+            <ListItemText primary="Profile" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleLogout}>
+            <ListItemIcon>
               <LoginIcon />
             </ListItemIcon>
-            <ListItemText primary="Login / Signup" />
+            <ListItemText primary="Logout" />
           </ListItemButton>
         </ListItem>
       </List>
@@ -207,16 +192,13 @@ const Navbar: React.FC = () => {
             transition={{ duration: 0.5 }}
           >
             {/* Navigation Buttons */}
-            <Box
-              sx={{
-                display: "flex",
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {renderNavButtons()}
-            </Box>
+            <NavigationButtons
+              activePage={activePage}
+              setActivePage={setActivePage}
+              isMobile={isMobile}
+              handleNavigation={handleNavigation}
+              
+            />
           </motion.div>
 
           {/* Mobile Menu Toggle and Desktop Controls */}
@@ -260,7 +242,7 @@ const Navbar: React.FC = () => {
               </motion.div>
             )}
 
-            {/* Avatar / Login for Desktop */}
+            {/* Avatar / User Menu for Desktop */}
             {!isMobile && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -271,22 +253,106 @@ const Navbar: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button
-                    startIcon={
-                      <Avatar sx={{ width: 24, height: 24 }}>U</Avatar>
-                    }
-                    sx={{
-                      color: "black",
-                      textTransform: "none",
-                      transition: "all 0.3s ease",
-                      borderRadius: 10,
-                      p: 2,
-                    }}
-                    onClick={handleLogout}
-                  >
-                    Hi {name}/ {role}
-                  </Button>
+                  {name ? (
+                    <Button
+                      startIcon={
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {name?.charAt(0).toUpperCase()}
+                        </Avatar>
+                      }
+                      sx={{
+                        color: "black",
+                        textTransform: "none",
+                        transition: "all 0.3s ease",
+                        borderRadius: 10,
+                        p: 2,
+                      }}
+                      onClick={handleMenuOpen}
+                    >
+                      Hi {name}
+                    </Button>
+                  ) : (
+                    <Button
+                      startIcon={
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {name?.charAt(0).toUpperCase()}
+                        </Avatar>
+                      }
+                      sx={{
+                        color: "black",
+                        textTransform: "none",
+                        transition: "all 0.3s ease",
+                        borderRadius: 10,
+                        p: 2,
+                      }}
+                      onClick={() => (window.location.href = "/home")} // or use a router navigation function
+                    >
+                      Login / Signup
+                    </Button>
+                  )}
                 </motion.div>
+
+                {/* Dropdown Menu */}
+                {name ? (
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    PaperProps={{
+                      elevation: 0,
+                      sx: {
+                        mt: 1,
+                        minWidth: 200,
+                        borderRadius: 2,
+                        boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
+                        "& .MuiAvatar-root": {
+                          width: 32,
+                          height: 32,
+                          ml: -0.5,
+                          mr: 1,
+                        },
+                      },
+                    }}
+                  >
+                    <MenuItem onClick={handleMenuClose}>
+                      <Typography variant="body2" color="text.secondary">
+                        Signed in as <strong>{name}</strong>
+                      </Typography>
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleNavigation("/profile", "Profile");
+                        handleMenuClose();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <FaUserLarge fontSize="small" />
+                      </ListItemIcon>
+                      Profile
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleLogout();
+                        handleMenuClose();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <LoginIcon fontSize="small" />
+                      </ListItemIcon>
+                      Logout
+                    </MenuItem>
+                  </Menu>
+                ) : (
+                  isLogin
+                )}
               </motion.div>
             )}
           </Box>
