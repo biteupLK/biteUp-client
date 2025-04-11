@@ -1,64 +1,61 @@
-import React, { Suspense } from "react";
-import { Route, Routes } from "react-router";
-
+import React from "react";
+import { Route, Routes, Navigate, Outlet } from "react-router";
 import RestaurantPage from "./views/resturantPage/ResturantPage";
 import FoodsPage from "./views/foodsPage/FoodsPage";
-import useAuth from "./customHooks/keycloak";
-import ErrorPage from "./views/login/Errorpage";
 import getUserDetails from "./customHooks/extractPayload";
-import Admin from "./views/adminPage/AdminPage";
-import PageLoader from "./components/PageLoader";
 import UserProfile from "./views/userProfile/UserProfile";
 import PaymentPage from "./views/paymentPage/PayementPage";
 import UserHome from "./views/homePage/UserHome";
-
+import Error from "./views/login/Errorpage";
+import useAuth from "../src/customHooks/keycloak";
+import ErrorPage from "./views/adminPage/ErrorPage";
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
-const AppRoutes = () => {
-  const isLogin = useAuth();
+const UserBackwardProtectedRoute = () => {
   const userDetails = getUserDetails();
   const role = userDetails?.role;
+
+  const user = userDetails?.name;
+  if (user && role != "Admin") {
+    return <Navigate to="/home" />;
+  }
+  return <Outlet />;
+};
+
+const AdminProtectedRoute = () => {
+  const userDetails = getUserDetails();
+  const role = userDetails?.role;
+
+  if (role != "Admin") {
+    return <Navigate to="/" />;
+  }
+
+  return <Outlet />;
+};
+
+const AppRoutes = () => {
+
+  const isLogin = useAuth();
+  console.log(isLogin)
+
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isLogin ? (
-              role === "Admin" ? (
-                <Admin />
-              ) : role == null ? (
-                <HomePage />
-              ) : (
-                <ErrorPage />
-              )
-            ) : (
-              <ErrorPage />
-            )
-          }
-        />
-        <Route
-          path="/restaurant"
-          element={isLogin ? <RestaurantPage /> : <ErrorPage />}
-        />
-        <Route
-          path="/foods"
-          element={isLogin ? <FoodsPage /> : <ErrorPage />}
-        />
-        <Route
-          path="/profile"
-          element={isLogin ? <UserProfile /> : <ErrorPage />}
-        />
-        <Route
-          path="/payment"
-          element={isLogin ? <PaymentPage /> : <ErrorPage />}
-        />
-        <Route
-          path="/home"
-          element={isLogin ? <UserHome /> : <ErrorPage />}
-        />
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route path="/profile" element={<UserProfile />} />
+      <Route path="/restaurant" element={<RestaurantPage />} />
+      <Route path="/foods" element={<FoodsPage />} />
+      <Route path="/home" element={<UserHome />} />
+      <Route path="/error" element={<ErrorPage />} />
+      <Route path="/payment" element={<PaymentPage />} />
+
+      <Route element={<UserBackwardProtectedRoute />}>
+        <Route path="/" element={<HomePage />} />
+      </Route>
+
+      <Route element={<AdminProtectedRoute />}>
+        <Route path="/admin" element={<Error />} />
+      </Route>
+
+    </Routes>
   );
 };
 
