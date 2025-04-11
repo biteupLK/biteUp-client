@@ -52,6 +52,8 @@ const AppRoutes = () => {
         <Route
           path="/payment"
           element={isLogin ? <PaymentPage /> : <ErrorPage />}
+        />
+        <Route
           path="/home"
           element={isLogin ? <UserHome /> : <ErrorPage />}
         />
