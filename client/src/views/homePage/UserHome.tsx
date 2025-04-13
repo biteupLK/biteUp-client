@@ -22,12 +22,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import PopularRestaurants from "../../components/PopularRestaurants";
-import Footer from "../../components/Footer";
+import Footer from "../../components/layOuts/Footer.tsx";
 import Loaders from "../../components/Loader.tsx";
 
 import kottu from "../../assets/kottu.jpg";
 import food from "../../assets/food.jpg";
-import screen from "../../assets/screen.jpg";
 import Navbar from "../../components/layOuts/Navbar";
 
 //images
@@ -35,13 +34,8 @@ import bikerider from "../../assets/homepage/homepageImgwithcricle.png";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRestaurantData } from "../../api/restaurantApi";
 
-
-
-
 const Loader = () => {
-  return (
-    <Loaders/>
-  );
+  return <Loaders />;
 };
 
 const Home: React.FC = () => {
@@ -55,6 +49,28 @@ const Home: React.FC = () => {
       queryFn: fetchRestaurantData,
     }
   );
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === "#search-section") {
+        setTimeout(() => {
+          document
+            .getElementById("search-section")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    };
+
+    // Initial check
+    handleHashChange();
+
+    // Add event listener for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
 
   useEffect(() => {
     // Simulate loading time (you can replace this with actual loading logic)
@@ -239,8 +255,10 @@ const Home: React.FC = () => {
               <Container sx={{ py: 4 }}>
                 {/* Hero Section with Search */}
                 <Paper
+                id="search-section"
                   elevation={0}
                   sx={{
+                    scrollMarginTop: "100px",
                     mb: 6,
                     textAlign: "center",
                     py: 6,
@@ -423,97 +441,6 @@ const Home: React.FC = () => {
 
                 {/* Popular Restaurants */}
                 <PopularRestaurants />
-
-                {/* Download App CTA */}
-                <Card
-                  elevation={0}
-                  sx={{
-                    borderRadius: "24px",
-                    mb: 6,
-                    background:
-                      "linear-gradient(135deg, #FF4757 0%, #FF7B69 100%)",
-                    color: "white",
-                    overflow: "hidden",
-                    border: "none",
-                    boxShadow: "0 10px 30px rgba(255, 71, 87, 0.3)",
-                  }}
-                >
-                  <Grid container>
-                    <Grid item xs={12} md={7}>
-                      <CardContent sx={{ p: { xs: 4, md: 5 } }}>
-                        <Typography
-                          variant="h5"
-                          component="h2"
-                          sx={{ fontWeight: 800, mb: 2 }}
-                        >
-                          Download the FoodGo app
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{ mb: 3, opacity: 0.9 }}
-                        >
-                          Get exclusive deals and faster ordering with our
-                          mobile app. Plus, enjoy special offers only available
-                          to app users!
-                        </Typography>
-                        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                          <Button
-                            variant="contained"
-                            sx={{
-                              bgcolor: "white",
-                              color: "#FF4757",
-                              "&:hover": { bgcolor: "#f0f0f0" },
-                              borderRadius: "12px",
-                              fontWeight: 600,
-                              px: 3,
-                            }}
-                          >
-                            App Store
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            sx={{
-                              borderColor: "white",
-                              color: "white",
-                              "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-                              borderRadius: "12px",
-                              fontWeight: 600,
-                              px: 3,
-                            }}
-                          >
-                            Google Play
-                          </Button>
-                        </Box>
-                      </CardContent>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      md={5}
-                      sx={{
-                        display: { xs: "none", md: "block" },
-                        position: "relative",
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={screen}
-                        alt="Mobile app screenshot"
-                        sx={{
-                          width: "110%",
-                          height: "120%",
-                          objectFit: "cover",
-                          position: "absolute",
-                          bottom: "-10%",
-                          right: "-5%",
-                          transform: "rotate(-5deg)",
-                          borderRadius: "24px",
-                          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Card>
 
                 {/* Footer */}
                 <Footer />
