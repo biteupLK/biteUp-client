@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext, MouseEvent } from "react";
 import {
   AppBar,
   Toolbar,
@@ -18,6 +18,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { Link, useLocation, useNavigate } from "react-router-dom"; // Added useNavigate
 import { motion } from "framer-motion";
 
@@ -26,7 +27,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
-import { FaCartShopping } from "react-icons/fa6";
+import { FaCartShopping, FaSearchengin } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
 import { FaUserLarge } from "react-icons/fa6";
 import useAuth from "../../customHooks/keycloak";
@@ -53,7 +54,7 @@ export const useNavContext = () => useContext(NavContext);
 
 const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activePage, setActivePage] = useState('Home');
+  const [activePage, setActivePage] = useState("Home");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -72,6 +73,16 @@ const Navbar: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const handleSearchClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Store scroll intention before navigating
+    sessionStorage.setItem('shouldScrollToSearch', 'true');
+    
+    // Navigate to home
+    navigate('/');
+  };
+
   // Update active page based on current route
   React.useEffect(() => {
     const path = location.pathname;
@@ -79,8 +90,6 @@ const Navbar: React.FC = () => {
     else if (path === "/restaurant") setActivePage("Restaurant");
     else if (path === "/foods") setActivePage("Foods");
   }, [location]);
-
-
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -98,7 +107,6 @@ const Navbar: React.FC = () => {
     { label: "Foods", icon: <IoFastFood />, path: "/foods" },
   ];
 
-  
   const mobileDrawer = (
     <Drawer
       variant="temporary"
@@ -197,7 +205,6 @@ const Navbar: React.FC = () => {
               setActivePage={setActivePage}
               isMobile={isMobile}
               handleNavigation={handleNavigation}
-              
             />
           </motion.div>
 
@@ -209,6 +216,29 @@ const Navbar: React.FC = () => {
               gap: { xs: 3, sm: 2 },
             }}
           >
+            {/* Search Button */}
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <IconButton
+                sx={{
+                  display: { xs: "inline-flex", md: "inline-flex" },
+                  p: 1,
+                }}
+                onClick={() => {
+                  if (window.location.pathname !== "/home") {
+                    navigate("/home#search-section"); // Navigate with hash
+                  } else {
+                    const searchSection =
+                      document.getElementById("search-section");
+                    if (searchSection) {
+                      searchSection.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }
+                }}
+              >
+                <SearchIcon style={{ fontSize: 30 }} />
+              </IconButton>
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

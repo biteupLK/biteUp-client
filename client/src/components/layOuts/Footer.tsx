@@ -14,13 +14,11 @@ import {
 import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 // Import your logo as needed
-import logo from "../assets/logo/biteUpLogo.png";
+import logo from "../../assets/logo/biteUpLogo.png";
 
 const Footer: React.FC = () => {
   const theme = useTheme();
