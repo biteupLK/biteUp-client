@@ -33,3 +33,7 @@
   --pallet-blue: #00327e;
   --pallet-pink: #ad6fc1;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
