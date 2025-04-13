@@ -37,6 +37,7 @@ import logo from "../../assets/logo/biteUpLogo.png";
 import getUserDetails from "../../customHooks/extractPayload";
 
 import NavigationButtons from "../NavigationButtons"; // Import your NavigationButtons component
+import { ChevronRight } from "@mui/icons-material";
 
 // Create a context to manage active page
 interface NavContextType {
@@ -75,12 +76,12 @@ const Navbar: React.FC = () => {
 
   const handleSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Store scroll intention before navigating
-    sessionStorage.setItem('shouldScrollToSearch', 'true');
-    
+    sessionStorage.setItem("shouldScrollToSearch", "true");
+
     // Navigate to home
-    navigate('/');
+    navigate("/");
   };
 
   // Update active page based on current route
@@ -352,32 +353,110 @@ const Navbar: React.FC = () => {
                       },
                     }}
                   >
-                    <MenuItem onClick={handleMenuClose}>
-                      <Typography variant="body2" color="text.secondary">
+                    <MenuItem
+                      onClick={handleMenuClose}
+                      sx={{
+                        cursor: "default",
+                        pointerEvents: "none",
+                        py: 1.5,
+                        px: 2,
+                        "&:hover": { bgcolor: "transparent" },
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          fontWeight: 500,
+                          opacity: 0.7,
+                          transition: "opacity 0.2s ease",
+                        }}
+                      >
                         Signed in as <strong>{name}</strong>
                       </Typography>
                     </MenuItem>
+
+                    {/* Profile Item */}
                     <MenuItem
                       onClick={() => {
                         handleNavigation("/profile", "Profile");
                         handleMenuClose();
                       }}
+                      sx={{
+                        borderRadius: "16px",
+                        mx: 1,
+                        my: 0.5,
+                        py: 1.5,
+                        px: 2,
+                        transition: "all 0.25s ease-out",
+                        "&:hover": {
+                          bgcolor: "action.hover",
+                          "& .menu-item-icon": {
+                            transform: "scale(1.1)",
+                            color: "primary.main",
+                          },
+                          "& .menu-item-arrow": {
+                            opacity: 1,
+                            transform: "translateX(0)",
+                          },
+                        },
+                      }}
                     >
-                      <ListItemIcon>
-                        <FaUserLarge fontSize="small" />
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <FaUserLarge
+                          fontSize="small"
+                          className="menu-item-icon"
+                        />
                       </ListItemIcon>
-                      Profile
+                      <Typography variant="body1">Profile</Typography>
+                      <Box
+                        className="menu-item-arrow"
+                        sx={{
+                          ml: "auto",
+                          opacity: 0,
+                          transform: "translateX(-4px)",
+                          transition: "all 0.25s ease-out",
+                          color: "text.secondary",
+                        }}
+                      >
+                        <ChevronRight fontSize="small" />
+                      </Box>
                     </MenuItem>
+
+                    {/* Logout Item */}
                     <MenuItem
                       onClick={() => {
                         handleLogout();
                         handleMenuClose();
                       }}
+                      sx={{
+                        borderRadius: "16px",
+                        mx: 1,
+                        my: 0.5,
+                        py: 1.5,
+                        px: 2,
+                        transition: "all 0.25s ease-out",
+                        "&:hover": {
+                          bgcolor: "error.light",
+                          color: "white",
+                          "& .menu-item-icon": {
+                            transform: "translateX(2px)",
+                            color: "white",
+                          },
+                        },
+                      }}
                     >
-                      <ListItemIcon>
-                        <LoginIcon fontSize="small" />
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <LoginIcon
+                          fontSize="small"
+                          className="menu-item-icon"
+                          sx={{
+                            color: "text.secondary",
+                            transition: "all 0.25s ease-out",
+                          }}
+                        />
                       </ListItemIcon>
-                      Logout
+                      <Typography variant="body1">Logout</Typography>
                     </MenuItem>
                   </Menu>
                 ) : (
