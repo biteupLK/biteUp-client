@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useIsMobile from "../../customHooks/useIsMobile";
-import theme from "../../theme"; // Import your Poppins theme
+import theme from "../../theme";
 import {
   ThemeProvider,
   Container,
@@ -10,99 +10,115 @@ import {
   Card,
   CardContent,
   Grid,
-  IconButton,
   TextField,
   InputAdornment,
-  Chip,
   Paper,
-  Divider,
-  Tabs,
-  Tab,
   Stack,
+  Fade,
+  Slide,
 } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
 
-import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SearchIcon from "@mui/icons-material/Search";
-import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
-import FastfoodIcon from "@mui/icons-material/Fastfood";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
-import LocalCafeIcon from "@mui/icons-material/LocalCafe";
-import EmojiFoodBeverageIcon from "@mui/icons-material/EmojiFoodBeverage";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { motion } from "framer-motion";
+import PopularRestaurants from "../../components/PopularRestaurants";
+import Footer from "../../components/layOuts/Footer.tsx";
+import Loaders from "../../components/Loader.tsx";
 
-import burger from "../../assets/burger.jpg";
-import pizza from "../../assets/pizza.jpg";
-import noodles from "../../assets/noodles.jpg";
 import kottu from "../../assets/kottu.jpg";
 import food from "../../assets/food.jpg";
-import screen from "../../assets/screen.jpg";
 import Navbar from "../../components/layOuts/Navbar";
 
 //images
-import bikerider from "../../assets/homepage/bikerider.png";
+import bikerider from "../../assets/homepage/homepageImgwithcricle.png";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRestaurantData } from "../../api/restaurantApi";
 
+const Loader = () => {
+  return <Loaders />;
+};
+
+// Animation variants for reuse
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
+
+const staggerChildren = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const textReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
 const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
-  const [tabValue, setTabValue] = useState(0);
+  const [value, setValue] = React.useState(0);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const { data: restaurantData, isFetching: isAccidentDataFetching } = useQuery({
+  const { data: restaurantData, isLoading } = useQuery({
     queryKey: ["restaurant"],
     queryFn: fetchRestaurantData,
   });
 
-  const foodCategories = [
-    { name: "Pizza", icon: <LocalPizzaIcon /> },
-    { name: "Burgers", icon: <FastfoodIcon /> },
-    { name: "Asian", icon: <RamenDiningIcon /> },
-    { name: "Cafe", icon: <LocalCafeIcon /> },
-    { name: "Breakfast", icon: <EmojiFoodBeverageIcon /> },
-    { name: "All", icon: <RestaurantIcon /> },
-  ];
+  useEffect(() => {
+    // Prevent scrolling during loading
+    if (isLoading) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+      // Reset scroll position when loading completes
+      window.scrollTo(0, 0);
+      setLoadingComplete(true);
+    }
 
-  const popularRestaurants = [
-    {
-      name: "Burger Joint",
-      rating: 4.8,
-      time: "20-30 min",
-      image: burger,
-      tags: ["Burgers", "American"],
-      promotion: "20% OFF",
-      featured: true,
-    },
-    {
-      name: "Pizza Plaza",
-      rating: 4.7,
-      time: "25-35 min",
-      image: pizza,
-      tags: ["Pizza", "Italian"],
-    },
-    {
-      name: "Noodle House",
-      rating: 4.9,
-      time: "15-25 min",
-      image: noodles,
-      tags: ["Asian", "Noodles"],
-      promotion: "Free Delivery",
-    },
-    {
-      name: "Green Garden",
-      rating: 4.6,
-      time: "20-30 min",
-      image: kottu,
-      tags: ["Helthy", "Salads"],
-    },
-  ];
+    const handleHashChange = () => {
+      if (window.location.hash === "#search-section") {
+        setTimeout(() => {
+          document
+            .getElementById("search-section")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    };
+
+    // Initial check
+    handleHashChange();
+
+    // Add event listener for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+
+    // Add scroll event listener
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("scroll", handleScroll);
+      document.body.style.overflow = 'auto'; // Cleanup
+    };
+  }, [isLoading]);
 
   const deals = [
     {
@@ -118,605 +134,539 @@ const Home: React.FC = () => {
   ];
 
   return (
-      <Box sx={{ flexGrow: 1, bgcolor: "white", minHeight: "100vh" }}>
-        {/* App Bar */}
-        <Navbar />
-
-        <Container
-          maxWidth="lg"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            height: "90vh",
-            py: 4,
-          }}
-        >
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={4}
-            alignItems="center"
-            justifyContent="space-between"
-            width="100%"
-          >
-            {/* Text Content */}
+    <ThemeProvider theme={theme}>
+      <Box sx={{ overflow: "hidden" }}>
+        {/* Optimized Loader with improved animation */}
+        <AnimatePresence>
+          {isLoading && (
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.6,
-                ease: "easeOut",
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
               style={{
-                maxWidth: 550,
-                textAlign: isMobile ? "center" : "left",
-                width: isMobile ? "100%" : "auto",
-              }}
-            >
-              <Typography
-                variant="h3"
-                component="h3"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  color: "text.primary",
-                  fontSize: isMobile ? "3rem" : "h2.fontSize",
-                }}
-              >
-                Fastest <br />
-                <Box component="span" sx={{ color: "orange" }}>
-                  Delivery
-                </Box>{" "}
-                &, <br />
-                Easy{" "}
-                <Box component="span" sx={{ color: "orange" }}>
-                  Pickup
-                </Box>
-                .
-              </Typography>
-
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={2}
-                sx={{
-                  mb: 10,
-                  mt: 5,
-                  justifyContent: { xs: "center", md: "flex-start" },
-                }}
-              >
-                {["Order Now", "Check Process"].map((text, index) => (
-                  <motion.button
-                    key={text}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      padding: "12px 24px",
-                      borderRadius: 8,
-                      backgroundColor: index === 0 ? "black" : "transparent",
-                      color: index === 0 ? "white" : "gray",
-                      border: index === 0 ? "none" : "1px solid gray",
-                      width: isMobile ? "100%" : "auto",
-                      cursor: "pointer",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {text}
-                  </motion.button>
-                ))}
-              </Stack>
-            </motion.div>
-
-            {/* Image Section with Motion Effects */}
-            <Box
-              sx={{
-                position: "relative",
-                maxWidth: 500,
-                width: "100%",
-                display: { xs: "none", md: "flex" },
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1000,
+                background: "white",
+                display: "flex",
+                alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  duration: 0.6,
-                  ease: "easeOut",
-                }}
-              >
-
-              <motion.div
-                initial={{ opacity: 1, scale: 1 }}
-                animate={{
-                  opacity: isMobile ? 0 : 1,
-                  scale: isMobile ? 0.8 : 1,
-                }}
-                transition={{
-                  duration: 0.5,
-                  ease: "easeInOut",
-                }}
-              >
-                <Box
-                  component="img"
-                  src={bikerider}
-                  alt="Delivery Person"
-                  sx={{
-                    maxHeight: 500,
-                    mt: 5,
-                    width: "auto",
-                    objectFit: "contain",
-                  }}
-                />
-              </motion.div>
-              </motion.div>
-            </Box>
-          </Stack>
-        </Container>
+              <Loader />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Main Content */}
-        <Container sx={{ py: 4 }}>
-          {/* Hero Section with Search */}
-          <Paper
-            elevation={0}
-            sx={{
-              mb: 6,
-              textAlign: "center",
-              py: 6,
-              px: 2,
-              backgroundImage:
-                "linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url(/api/placeholder/1200/300)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              borderRadius: "16px",
-              border: "1px solid #eee",
-            }}
-          >
-            <Typography
-              variant={isMobile ? "h4" : "h3"}
-              component="h1"
-              sx={{ fontWeight: 800, mb: 2, color: "#333" }}
-            >
-              Delicious food, delivered{" "}
-              <Box component="span" sx={{ color: "#FF4757" }}>
-                fastB {restaurantData?.restaurantName}
-              </Box>
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 4,
-                color: "#666",
-                maxWidth: "600px",
-                mx: "auto",
-              }}
-            >
-              Order from the best local restaurants with easy, on-demand
-              delivery.
-            </Typography>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoading ? 0 : 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Box sx={{ flexGrow: 1, bgcolor: "white", minHeight: "100vh" }}>
+            <Navbar />
 
-            <TextField
-              fullWidth
-              placeholder="Search for food or restaurants"
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: "#FF4757" }} />
-                  </InputAdornment>
-                ),
-                sx: {
-                  borderRadius: "12px",
-                  maxWidth: "600px",
-                  mx: "auto",
-                  bgcolor: "white",
-                  boxShadow: "0 4px 14px rgba(0, 0, 0, 0.05)",
-                  "& fieldset": { border: "none" },
-                },
-              }}
-            />
-          </Paper>
-
-          {/* Featured Deals Carousel */}
-          <Box sx={{ mb: 6 }}>
-            <Box
+            <Container
+              maxWidth="lg"
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
                 alignItems: "center",
-                mb: 3,
+                height: "90vh",
+                py: 4,
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 700, display: "flex", alignItems: "center" }}
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={4}
+                alignItems="center"
+                justifyContent="space-between"
+                width="100%"
               >
-                <LocalOfferIcon sx={{ mr: 1, color: "#FF4757" }} /> Featured
-                Deals
-              </Typography>
-              <Button
-                endIcon={<KeyboardArrowRightIcon />}
-                sx={{ color: "#FF4757", fontWeight: 500 }}
-              >
-                View All
-              </Button>
-            </Box>
-
-            <Grid container spacing={3}>
-              {deals.map((deal, index) => (
-                <Grid item xs={12} sm={6} key={index}>
-                  <Card
-                    elevation={0}
-                    sx={{
-                      borderRadius: "16px",
-                      overflow: "hidden",
-                      border: "1px solid #eee",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: "0 10px 20px rgba(0,0,0,0.08)",
-                      },
-                      transition: "all 0.3s ease",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: { xs: "column", sm: "row" },
-                    }}
-                  >
-                    <Box
+                {/* Text Content with staggered animations */}
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={staggerChildren}
+                  style={{
+                    maxWidth: 550,
+                    textAlign: isMobile ? "center" : "left",
+                    width: isMobile ? "100%" : "auto",
+                  }}
+                >
+                  <motion.div variants={textReveal}>
+                    <Typography
+                      variant="h3"
+                      component="h3"
+                      gutterBottom
                       sx={{
-                        width: { xs: "100%", sm: "40%" },
-                        position: "relative",
+                        fontWeight: "bold",
+                        color: "text.primary",
+                        fontSize: isMobile ? "3rem" : "h2.fontSize",
                       }}
                     >
-                      <Box
-                        component="img"
-                        src={deal.image}
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
+                      Fastest <br />
+                      <motion.span
+                        initial={{ color: "#000" }}
+                        animate={{ color: "#ff9800" }}
+                        transition={{
+                          duration: 0.8,
+                          delay: 0.6,
                         }}
-                      />
-                    </Box>
-                    <CardContent
+                        style={{ display: "inline-block" }}
+                      >
+                        Delivery
+                      </motion.span>{" "}
+                      &, <br />
+                      Easy{" "}
+                      <motion.span
+                        initial={{ color: "#000" }}
+                        animate={{ color: "#ff9800" }}
+                        transition={{
+                          duration: 0.8,
+                          delay: 1.2,
+                        }}
+                        style={{ display: "inline-block" }}
+                      >
+                        Pickup
+                      </motion.span>
+                      .
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div variants={fadeInUp} transition={{ delay: 0.4 }}>
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={2}
                       sx={{
-                        flexGrow: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
+                        mb: 10,
+                        mt: 5,
+                        justifyContent: { xs: "center", md: "flex-start" },
                       }}
                     >
-                      <Typography
-                        variant="h6"
-                        component="h3"
-                        sx={{ fontWeight: 700, color: "#FF4757" }}
-                      >
-                        {deal.title}
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: "#666", mb: 2 }}>
-                        {deal.description}
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        sx={{
-                          borderColor: "#FF4757",
-                          color: "#FF4757",
-                          "&:hover": { bgcolor: "rgba(255,71,87,0.1)" },
-                          alignSelf: "flex-start",
-                          borderRadius: "8px",
-                        }}
-                      >
-                        Get Deal
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-
-          {/* Categories Tabs Section */}
-          <Box sx={{ mb: 6 }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                "& .MuiTabs-indicator": {
-                  backgroundColor: "#FF4757",
-                },
-                "& .MuiTab-root.Mui-selected": {
-                  color: "#FF4757",
-                  fontWeight: 600,
-                },
-                mb: 3,
-                borderBottom: "1px solid #eee",
-              }}
-            >
-              {foodCategories.map((category, index) => (
-                <Tab
-                  key={index}
-                  icon={category.icon}
-                  label={category.name}
-                  iconPosition="start"
-                  sx={{ textTransform: "none", fontWeight: 500 }}
-                />
-              ))}
-            </Tabs>
-          </Box>
-
-          {/* Popular Restaurants */}
-          <Box sx={{ mb: 6 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 3,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 700, display: "flex", alignItems: "center" }}
-              >
-                <RestaurantIcon sx={{ mr: 1, color: "#FF4757" }} /> Popular
-                Restaurants
-              </Typography>
-              <Button
-                endIcon={<KeyboardArrowRightIcon />}
-                sx={{ color: "#FF4757", fontWeight: 500 }}
-              >
-                View All
-              </Button>
-            </Box>
-
-            <Grid container spacing={3}>
-              {popularRestaurants.map((restaurant, index) => (
-                <Grid item xs={12} sm={6} md={3} key={index}>
-                  <Card
-                    elevation={0}
-                    sx={{
-                      borderRadius: "16px",
-                      overflow: "hidden",
-                      border: "1px solid #eee",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: "0 10px 20px rgba(0,0,0,0.08)",
-                      },
-                      transition: "all 0.3s ease",
-                      position: "relative",
-                    }}
-                  >
-                    <Box sx={{ position: "relative" }}>
-                      <Box
-                        component="img"
-                        src={restaurant.image}
-                        sx={{
-                          width: "100%",
-                          height: 160,
-                          objectFit: "cover",
-                        }}
-                      />
-                      {restaurant.promotion && (
-                        <Chip
-                          label={restaurant.promotion}
-                          sx={{
-                            position: "absolute",
-                            top: 10,
-                            left: 10,
-                            bgcolor: "#FF4757",
-                            color: "white",
-                            fontWeight: 600,
+                      {["Order Now", "Check Process"].map((text, index) => (
+                        <motion.button
+                          key={text}
+                          whileHover={{
+                            scale: 1.05,
+                            boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
                           }}
-                          size="small"
-                        />
-                      )}
-                      <Chip
-                        label={`${restaurant.rating} ★`}
+                          whileTap={{ scale: 0.95 }}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: index * 0.2 + 1.0,
+                          }}
+                          style={{
+                            padding: "12px 24px",
+                            borderRadius: 8,
+                            backgroundColor:
+                              index === 0 ? "black" : "transparent",
+                            color: index === 0 ? "white" : "gray",
+                            border: index === 0 ? "none" : "1px solid gray",
+                            width: isMobile ? "100%" : "auto",
+                            cursor: "pointer",
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {text}
+                        </motion.button>
+                      ))}
+                    </Stack>
+                  </motion.div>
+                </motion.div>
+
+                {/* Image Section with Enhanced Motion Effects */}
+                <Box
+                  sx={{
+                    position: "relative",
+                    maxWidth: 500,
+                    width: "100%",
+                    display: { xs: "none", md: "flex" },
+                    justifyContent: "center",
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.8,
+                      ease: "easeOut",
+                      delay: 0.5,
+                    }}
+                  >
+                    {/* Background circle animation */}
+                    <motion.div
+                      style={{
+                        position: "absolute",
+                        borderRadius: "50%",
+                        background: "rgba(255, 165, 0, 0.1)",
+                        width: "100%",
+                        height: "100%",
+                        zIndex: -1,
+                      }}
+                      animate={{
+                        scale: [1, 1.05, 1],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+
+                    <motion.div
+                      animate={{
+                        y: [0, -15, 0],
+                      }}
+                      transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={bikerider}
+                        alt="Delivery Person"
                         sx={{
-                          position: "absolute",
-                          top: 10,
-                          right: 10,
-                          bgcolor: "white",
-                          fontWeight: 600,
-                          color: "#FF9800",
+                          maxHeight: 500,
+                          mt: 5,
+                          width: "auto",
+                          objectFit: "contain",
+                          filter: "drop-shadow(0px 10px 20px rgba(0,0,0,0.15))",
                         }}
-                        size="small"
                       />
-                      <IconButton
-                        sx={{
-                          position: "absolute",
-                          bottom: -20,
-                          right: 10,
-                          bgcolor: "white",
-                          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          "&:hover": { bgcolor: "#fff0f0" },
-                        }}
-                        size="small"
-                      >
-                        <FavoriteIcon
-                          sx={{ color: "#FF4757" }}
-                          fontSize="small"
-                        />
-                      </IconButton>
-                    </Box>
-                    <CardContent sx={{ pt: 3 }}>
+                    </motion.div>
+                  </motion.div>
+                </Box>
+              </Stack>
+            </Container>
+
+            <Container sx={{ py: 4 }}>
+              {/* Hero Section with Search - Animated on scroll */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeInUp}
+              >
+                <Paper
+                  id="search-section"
+                  elevation={0}
+                  sx={{
+                    scrollMarginTop: "100px",
+                    mb: 6,
+                    textAlign: "center",
+                    py: 6,
+                    px: 2,
+                    backgroundImage:
+                      "linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url(/api/placeholder/1200/300)",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    borderRadius: "16px",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <motion.div variants={textReveal}>
+                    <Typography
+                      variant={isMobile ? "h4" : "h3"}
+                      component="h1"
+                      sx={{ fontWeight: 800, mb: 2, color: "#333" }}
+                    >
+                      Delicious food, delivered{" "}
+                      <Box component="span" sx={{ color: "orange" }}>
+                        fast {restaurantData?.restaurantName}
+                      </Box>
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div variants={textReveal}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        mb: 4,
+                        color: "#666",
+                        maxWidth: "600px",
+                        mx: "auto",
+                      }}
+                    >
+                      Order from the best local restaurants with easy, on-demand
+                      delivery.
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div
+                    variants={fadeInUp}
+                    animate={
+                      searchFocused
+                        ? {
+                            scale: 1.02,
+                            transition: { duration: 0.3 },
+                          }
+                        : {}
+                    }
+                  >
+                    <TextField
+                      fullWidth
+                      placeholder="Search for food or restaurants"
+                      variant="outlined"
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <motion.div
+                              animate={
+                                searchFocused
+                                  ? {
+                                      rotate: [0, -10, 10, -10, 0],
+                                      transition: { duration: 0.5 },
+                                    }
+                                  : {}
+                              }
+                            >
+                              <SearchIcon
+                                sx={{
+                                  color: searchFocused ? "orange" : "#9e9e9e",
+                                }}
+                              />
+                            </motion.div>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        maxWidth: "600px",
+                        mx: "auto",
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          borderRadius: "28px",
+                          backgroundColor: "white",
+                          boxShadow: searchFocused
+                            ? "0 8px 28px rgba(0, 0, 0, 0.15)"
+                            : "0 6px 20px rgba(0, 0, 0, 0.20)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.30)",
+                          },
+                          "&.Mui-focused": {
+                            boxShadow: "0 8px 28px rgba(0, 0, 0, 0.15)",
+                          },
+                          "& fieldset": {
+                            border: "none",
+                          },
+                        },
+                        "& .MuiInputBase-input": {
+                          padding: "16px 20px 16px 8px",
+                        },
+                      }}
+                    />
+                  </motion.div>
+                </Paper>
+              </motion.div>
+
+              {/* Featured Deals Carousel with improved animations */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeInUp}
+              >
+                <Box sx={{ mb: 6 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 3,
+                    }}
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
+                      }}
+                    >
                       <Typography
                         variant="h6"
-                        component="h3"
-                        sx={{ fontWeight: 600 }}
-                      >
-                        {restaurant.name}
-                        {restaurant.featured && (
-                          <Box
-                            component="span"
-                            sx={{ ml: 1, display: "inline-block" }}
-                          >
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="#FF4757"
-                            >
-                              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                            </svg>
-                          </Box>
-                        )}
-                      </Typography>
-                      <Box
                         sx={{
+                          fontWeight: 700,
                           display: "flex",
                           alignItems: "center",
-                          color: "#666",
-                          mb: 1,
                         }}
                       >
-                        <AccessTimeIcon
-                          sx={{ fontSize: "0.9rem", mr: 0.5, color: "#98A2B3" }}
-                        />
-                        <Typography variant="body2" sx={{ color: "#666" }}>
-                          {restaurant.time}
-                        </Typography>
-                        <Box
-                          sx={{ mx: 1, fontSize: "0.5rem", color: "#98A2B3" }}
+                        <motion.div
+                          animate={{
+                            rotate: [0, -10, 0],
+                            scale: [1, 1.2, 1],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            repeatDelay: 5,
+                          }}
                         >
-                          •
-                        </Box>
-                        <DeliveryDiningIcon
-                          sx={{ fontSize: "0.9rem", mr: 0.5, color: "#98A2B3" }}
-                        />
-                        <Typography variant="body2" sx={{ color: "#666" }}>
-                          Free delivery
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-                        {restaurant.tags.map((tag, i) => (
-                          <Chip
-                            key={i}
-                            label={tag}
-                            size="small"
-                            sx={{
-                              bgcolor: "#f0f0f0",
-                              color: "#666",
-                              fontWeight: 500,
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+                          <LocalOfferIcon sx={{ mr: 1, color: "green" }} />
+                        </motion.div>
+                        Featured Deals
+                      </Typography>
+                    </motion.div>
 
-          {/* Download App CTA */}
-          <Card
-            elevation={0}
-            sx={{
-              borderRadius: "24px",
-              mb: 6,
-              background: "linear-gradient(135deg, #FF4757 0%, #FF7B69 100%)",
-              color: "white",
-              overflow: "hidden",
-              border: "none",
-              boxShadow: "0 10px 30px rgba(255, 71, 87, 0.3)",
-            }}
-          >
-            <Grid container>
-              <Grid item xs={12} md={7}>
-                <CardContent sx={{ p: { xs: 4, md: 5 } }}>
-                  <Typography
-                    variant="h5"
-                    component="h2"
-                    sx={{ fontWeight: 800, mb: 2 }}
-                  >
-                    Download the FoodGo app
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                    Get exclusive deals and faster ordering with our mobile app.
-                    Plus, enjoy special offers only available to app users!
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        bgcolor: "white",
-                        color: "#FF4757",
-                        "&:hover": { bgcolor: "#f0f0f0" },
-                        borderRadius: "12px",
-                        fontWeight: 600,
-                        px: 3,
+                    <motion.div
+                      whileHover={{ x: 5 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
                       }}
                     >
-                      App Store
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        borderColor: "white",
-                        color: "white",
-                        "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-                        borderRadius: "12px",
-                        fontWeight: 600,
-                        px: 3,
-                      }}
-                    >
-                      Google Play
-                    </Button>
+                      <Button
+                        endIcon={<KeyboardArrowRightIcon />}
+                        sx={{ color: "green", fontWeight: 500 }}
+                      >
+                        View All
+                      </Button>
+                    </motion.div>
                   </Box>
-                </CardContent>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                md={5}
-                sx={{
-                  display: { xs: "none", md: "block" },
-                  position: "relative",
-                }}
-              >
-                <Box
-                  component="img"
-                  src={screen}
-                  alt="Mobile app screenshot"
-                  sx={{
-                    width: "110%",
-                    height: "120%",
-                    objectFit: "cover",
-                    position: "absolute",
-                    bottom: "-10%",
-                    right: "-5%",
-                    transform: "rotate(-5deg)",
-                    borderRadius: "24px",
-                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Card>
 
-          {/* Footer */}
-          <Box sx={{ pt: 4, pb: 8, textAlign: "center" }}>
-            <Divider sx={{ mb: 4 }} />
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, color: "#FF4757", mb: 2 }}
-            >
-              <RestaurantIcon sx={{ mr: 1, transform: "rotate(45deg)" }} />
-              FoodGo
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#666", mb: 2 }}>
-              © 2025 FoodGo. All rights reserved.
-            </Typography>
-            <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-              <Button sx={{ color: "#666" }}>About Us</Button>
-              <Button sx={{ color: "#666" }}>Privacy</Button>
-              <Button sx={{ color: "#666" }}>Terms</Button>
-              <Button sx={{ color: "#666" }}>Help</Button>
-            </Box>
+                  <Grid container spacing={3}>
+                    {deals.map((deal, index) => (
+                      <Grid item xs={12} sm={6} key={index}>
+                        <motion.div
+                          initial={{ opacity: 0, y: 30 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: index * 0.15,
+                          }}
+                        >
+                          <motion.div
+                            whileHover={{
+                              y: -8,
+                              boxShadow: "0 15px 30px rgba(0,0,0,0.12)",
+                            }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 17,
+                            }}
+                          >
+                            <Card
+                              elevation={0}
+                              sx={{
+                                borderRadius: "16px",
+                                overflow: "hidden",
+                                border: "1px solid #eee",
+                                transition: "all 0.3s ease",
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: { xs: "column", sm: "row" },
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: { xs: "100%", sm: "40%" },
+                                  position: "relative",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                  <Box
+                                    component="img"
+                                    src={deal.image}
+                                    sx={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                              </Box>
+
+                              <CardContent
+                                sx={{
+                                  flexGrow: 1,
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  bgcolor: "#fffded",
+                                }}
+                              >
+                                <Typography
+                                  variant="h6"
+                                  component="h3"
+                                  sx={{ fontWeight: 700, color: "#3a4d39" }}
+                                >
+                                  {deal.title}
+                                </Typography>
+                                <Typography
+                                  variant="body1"
+                                  sx={{ color: "#666", mb: 2 }}
+                                >
+                                  {deal.description}
+                                </Typography>
+                                <motion.div
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <Button
+                                    variant="outlined"
+                                    sx={{
+                                      borderColor: "#ffa500",
+                                      color: "#D46F12",
+                                      "&:hover": {
+                                        bgcolor: "#ffa500",
+                                        color: "white",
+                                      },
+                                      fontWeight: 500,
+                                      alignSelf: "flex-start",
+                                      borderRadius: "8px",
+                                    }}
+                                  >
+                                    Get Deal
+                                  </Button>
+                                </motion.div>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        </motion.div>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              </motion.div>
+
+              {/* Popular Restaurants with scroll animation */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1 }}
+                variants={fadeInUp}
+              >
+                <PopularRestaurants />
+              </motion.div>
+
+              {/* Footer with subtle animation */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <Footer />
+              </motion.div>
+            </Container>
           </Box>
-        </Container>
+        </motion.div>
       </Box>
+    </ThemeProvider>
   );
 };
 

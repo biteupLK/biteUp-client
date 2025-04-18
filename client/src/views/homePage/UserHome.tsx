@@ -14,7 +14,8 @@ import {
   InputAdornment,
   Paper,
   Stack,
-  CircularProgress,
+  Fade,
+  Slide,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,19 +39,58 @@ const Loader = () => {
   return <Loaders />;
 };
 
+// Animation variants for reuse
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
+
+const staggerChildren = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const textReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
 const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
   const [value, setValue] = React.useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
-  const { data: restaurantData, isFetching: isAccidentDataFetching } = useQuery(
-    {
-      queryKey: ["restaurant"],
-      queryFn: fetchRestaurantData,
-    }
-  );
+  const { data: restaurantData, isLoading } = useQuery({
+    queryKey: ["restaurant"],
+    queryFn: fetchRestaurantData,
+  });
 
   useEffect(() => {
+    // Prevent scrolling during loading
+    if (isLoading) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+      // Reset scroll position when loading completes
+      window.scrollTo(0, 0);
+      setLoadingComplete(true);
+    }
+
     const handleHashChange = () => {
       if (window.location.hash === "#search-section") {
         setTimeout(() => {
@@ -67,19 +107,18 @@ const Home: React.FC = () => {
     // Add event listener for hash changes
     window.addEventListener("hashchange", handleHashChange);
 
+    // Add scroll event listener
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("scroll", handleScroll);
+      document.body.style.overflow = 'auto'; // Cleanup
     };
-  }, []);
-
-  useEffect(() => {
-    // Simulate loading time (you can replace this with actual loading logic)
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading]);
 
   const deals = [
     {
@@ -96,49 +135,70 @@ const Home: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AnimatePresence>
-        {isLoading ? (
-          <Loader />
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Box sx={{ flexGrow: 1, bgcolor: "white", minHeight: "100vh" }}>
-              {/* App Bar */}
-              <Navbar />
+      <Box sx={{ overflow: "hidden" }}>
+        {/* Optimized Loader with improved animation */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1000,
+                background: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Loader />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <Container
-                maxWidth="lg"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "90vh",
-                  py: 4,
-                }}
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoading ? 0 : 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Box sx={{ flexGrow: 1, bgcolor: "white", minHeight: "100vh" }}>
+            <Navbar />
+
+            <Container
+              maxWidth="lg"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                height: "90vh",
+                py: 4,
+              }}
+            >
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={4}
+                alignItems="center"
+                justifyContent="space-between"
+                width="100%"
               >
-                <Stack
-                  direction={{ xs: "column", md: "row" }}
-                  spacing={4}
-                  alignItems="center"
-                  justifyContent="space-between"
-                  width="100%"
+                {/* Text Content with staggered animations */}
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={staggerChildren}
+                  style={{
+                    maxWidth: 550,
+                    textAlign: isMobile ? "center" : "left",
+                    width: isMobile ? "100%" : "auto",
+                  }}
                 >
-                  {/* Text Content */}
-                  <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.6,
-                      ease: "easeOut",
-                    }}
-                    style={{
-                      maxWidth: 550,
-                      textAlign: isMobile ? "center" : "left",
-                      width: isMobile ? "100%" : "auto",
-                    }}
-                  >
+                  <motion.div variants={textReveal}>
                     <Typography
                       variant="h3"
                       component="h3"
@@ -150,17 +210,35 @@ const Home: React.FC = () => {
                       }}
                     >
                       Fastest <br />
-                      <Box component="span" sx={{ color: "orange" }}>
+                      <motion.span
+                        initial={{ color: "#000" }}
+                        animate={{ color: "#ff9800" }}
+                        transition={{
+                          duration: 0.8,
+                          delay: 0.6,
+                        }}
+                        style={{ display: "inline-block" }}
+                      >
                         Delivery
-                      </Box>{" "}
+                      </motion.span>{" "}
                       &, <br />
                       Easy{" "}
-                      <Box component="span" sx={{ color: "orange" }}>
+                      <motion.span
+                        initial={{ color: "#000" }}
+                        animate={{ color: "#ff9800" }}
+                        transition={{
+                          duration: 0.8,
+                          delay: 1.2,
+                        }}
+                        style={{ display: "inline-block" }}
+                      >
                         Pickup
-                      </Box>
+                      </motion.span>
                       .
                     </Typography>
+                  </motion.div>
 
+                  <motion.div variants={fadeInUp} transition={{ delay: 0.4 }}>
                     <Stack
                       direction={{ xs: "column", sm: "row" }}
                       spacing={2}
@@ -173,8 +251,17 @@ const Home: React.FC = () => {
                       {["Order Now", "Check Process"].map((text, index) => (
                         <motion.button
                           key={text}
-                          whileHover={{ scale: 1.05 }}
+                          whileHover={{
+                            scale: 1.05,
+                            boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
+                          }}
                           whileTap={{ scale: 0.95 }}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: index * 0.2 + 1.0,
+                          }}
                           style={{
                             padding: "12px 24px",
                             borderRadius: 8,
@@ -193,69 +280,85 @@ const Home: React.FC = () => {
                       ))}
                     </Stack>
                   </motion.div>
+                </motion.div>
 
-                  {/* Image Section with Motion Effects */}
-                  <Box
-                    sx={{
-                      position: "relative",
-                      maxWidth: 500,
-                      width: "100%",
-                      display: { xs: "none", md: "flex" },
-                      justifyContent: "center",
+                {/* Image Section with Enhanced Motion Effects */}
+                <Box
+                  sx={{
+                    position: "relative",
+                    maxWidth: 500,
+                    width: "100%",
+                    display: { xs: "none", md: "flex" },
+                    justifyContent: "center",
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.8,
+                      ease: "easeOut",
+                      delay: 0.5,
                     }}
                   >
+                    {/* Background circle animation */}
                     <motion.div
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      style={{
+                        position: "absolute",
+                        borderRadius: "50%",
+                        background: "rgba(255, 165, 0, 0.1)",
+                        width: "100%",
+                        height: "100%",
+                        zIndex: -1,
+                      }}
+                      animate={{
+                        scale: [1, 1.05, 1],
+                      }}
                       transition={{
-                        duration: 0.6,
-                        ease: "easeOut",
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+
+                    <motion.div
+                      animate={{
+                        y: [0, -15, 0],
+                      }}
+                      transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
                       }}
                     >
-                      <motion.div
-                        initial={{ opacity: 1, scale: 1 }}
-                        animate={{
-                          opacity: isMobile ? 0 : 1,
-                          scale: isMobile ? 0.8 : 1,
+                      <Box
+                        component="img"
+                        src={bikerider}
+                        alt="Delivery Person"
+                        sx={{
+                          maxHeight: 500,
+                          mt: 5,
+                          width: "auto",
+                          objectFit: "contain",
+                          filter: "drop-shadow(0px 10px 20px rgba(0,0,0,0.15))",
                         }}
-                        transition={{
-                          duration: 0.5,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        <motion.div
-                          animate={{
-                            y: [0, -10, 0],
-                          }}
-                          transition={{
-                            duration: 5,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                        >
-                          <Box
-                            component="img"
-                            src={bikerider}
-                            alt="Delivery Person"
-                            sx={{
-                              maxHeight: 500,
-                              mt: 5,
-                              width: "auto",
-                              objectFit: "contain",
-                            }}
-                          />
-                        </motion.div>
-                      </motion.div>
+                      />
                     </motion.div>
-                  </Box>
-                </Stack>
-              </Container>
+                  </motion.div>
+                </Box>
+              </Stack>
+            </Container>
 
-              {/* Main Content */}
-              <Container sx={{ py: 4 }}>
-                {/* Hero Section with Search */}
+            <Container sx={{ py: 4 }}>
+              {/* Hero Section with Search - Animated on scroll */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeInUp}
+              >
                 <Paper
-                id="search-section"
+                  id="search-section"
                   elevation={0}
                   sx={{
                     scrollMarginTop: "100px",
@@ -268,69 +371,113 @@ const Home: React.FC = () => {
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     borderRadius: "16px",
+                    transition: "all 0.3s ease",
                   }}
                 >
-                  <Typography
-                    variant={isMobile ? "h4" : "h3"}
-                    component="h1"
-                    sx={{ fontWeight: 800, mb: 2, color: "#333" }}
-                  >
-                    Delicious food, delivered{" "}
-                    <Box component="span" sx={{ color: "orange" }}>
-                      fast {restaurantData?.restaurantName}
-                    </Box>
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      mb: 4,
-                      color: "#666",
-                      maxWidth: "600px",
-                      mx: "auto",
-                    }}
-                  >
-                    Order from the best local restaurants with easy, on-demand
-                    delivery.
-                  </Typography>
+                  <motion.div variants={textReveal}>
+                    <Typography
+                      variant={isMobile ? "h4" : "h3"}
+                      component="h1"
+                      sx={{ fontWeight: 800, mb: 2, color: "#333" }}
+                    >
+                      Delicious food, delivered{" "}
+                      <Box component="span" sx={{ color: "orange" }}>
+                        fast {restaurantData?.restaurantName}
+                      </Box>
+                    </Typography>
+                  </motion.div>
 
-                  <TextField
-                    fullWidth
-                    placeholder="Search for food or restaurants"
-                    variant="outlined"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon sx={{ color: "#9e9e9e" }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      maxWidth: "600px",
-                      mx: "auto",
-                      "& .MuiOutlinedInput-root": {
-                        height: "56px",
-                        borderRadius: "28px",
-                        backgroundColor: "white",
-                        boxShadow: "0 6px 20px rgba(0, 0, 0, 0.20)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.30)",
+                  <motion.div variants={textReveal}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        mb: 4,
+                        color: "#666",
+                        maxWidth: "600px",
+                        mx: "auto",
+                      }}
+                    >
+                      Order from the best local restaurants with easy, on-demand
+                      delivery.
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div
+                    variants={fadeInUp}
+                    animate={
+                      searchFocused
+                        ? {
+                            scale: 1.02,
+                            transition: { duration: 0.3 },
+                          }
+                        : {}
+                    }
+                  >
+                    <TextField
+                      fullWidth
+                      placeholder="Search for food or restaurants"
+                      variant="outlined"
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <motion.div
+                              animate={
+                                searchFocused
+                                  ? {
+                                      rotate: [0, -10, 10, -10, 0],
+                                      transition: { duration: 0.5 },
+                                    }
+                                  : {}
+                              }
+                            >
+                              <SearchIcon
+                                sx={{
+                                  color: searchFocused ? "orange" : "#9e9e9e",
+                                }}
+                              />
+                            </motion.div>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        maxWidth: "600px",
+                        mx: "auto",
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          borderRadius: "28px",
+                          backgroundColor: "white",
+                          boxShadow: searchFocused
+                            ? "0 8px 28px rgba(0, 0, 0, 0.15)"
+                            : "0 6px 20px rgba(0, 0, 0, 0.20)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.30)",
+                          },
+                          "&.Mui-focused": {
+                            boxShadow: "0 8px 28px rgba(0, 0, 0, 0.15)",
+                          },
+                          "& fieldset": {
+                            border: "none",
+                          },
                         },
-                        "&.Mui-focused": {
-                          boxShadow: "0 8px 28px rgba(0, 0, 0, 0.15)",
+                        "& .MuiInputBase-input": {
+                          padding: "16px 20px 16px 8px",
                         },
-                        "& fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& .MuiInputBase-input": {
-                        padding: "16px 20px 16px 8px",
-                      },
-                    }}
-                  />
+                      }}
+                    />
+                  </motion.div>
                 </Paper>
+              </motion.div>
 
-                {/* Featured Deals Carousel */}
+              {/* Featured Deals Carousel with improved animations */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeInUp}
+              >
                 <Box sx={{ mb: 6 }}>
                   <Box
                     sx={{
@@ -340,115 +487,185 @@ const Home: React.FC = () => {
                       mb: 3,
                     }}
                   >
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        display: "flex",
-                        alignItems: "center",
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
                       }}
                     >
-                      <LocalOfferIcon sx={{ mr: 1, color: "green" }} /> Featured
-                      Deals
-                    </Typography>
-                    <Button
-                      endIcon={<KeyboardArrowRightIcon />}
-                      sx={{ color: "green", fontWeight: 500 }}
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <motion.div
+                          animate={{
+                            rotate: [0, -10, 0],
+                            scale: [1, 1.2, 1],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            repeatDelay: 5,
+                          }}
+                        >
+                          <LocalOfferIcon sx={{ mr: 1, color: "green" }} />
+                        </motion.div>
+                        Featured Deals
+                      </Typography>
+                    </motion.div>
+
+                    <motion.div
+                      whileHover={{ x: 5 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
+                      }}
                     >
-                      View All
-                    </Button>
+                      <Button
+                        endIcon={<KeyboardArrowRightIcon />}
+                        sx={{ color: "green", fontWeight: 500 }}
+                      >
+                        View All
+                      </Button>
+                    </motion.div>
                   </Box>
 
                   <Grid container spacing={3}>
                     {deals.map((deal, index) => (
                       <Grid item xs={12} sm={6} key={index}>
-                        <Card
-                          elevation={0}
-                          sx={{
-                            borderRadius: "16px",
-                            overflow: "hidden",
-                            border: "1px solid #eee",
-                            "&:hover": {
-                              transform: "translateY(-4px)",
-                              boxShadow: "0 10px 20px rgba(0,0,0,0.08)",
-                            },
-                            transition: "all 0.3s ease",
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: { xs: "column", sm: "row" },
+                        <motion.div
+                          initial={{ opacity: 0, y: 30 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: index * 0.15,
                           }}
                         >
-                          <Box
-                            sx={{
-                              width: { xs: "100%", sm: "40%" },
-                              position: "relative",
+                          <motion.div
+                            whileHover={{
+                              y: -8,
+                              boxShadow: "0 15px 30px rgba(0,0,0,0.12)",
+                            }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 17,
                             }}
                           >
-                            <Box
-                              component="img"
-                              src={deal.image}
+                            <Card
+                              elevation={0}
                               sx={{
-                                width: "100%",
+                                borderRadius: "16px",
+                                overflow: "hidden",
+                                border: "1px solid #eee",
+                                transition: "all 0.3s ease",
                                 height: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                          </Box>
-                          <CardContent
-                            sx={{
-                              flexGrow: 1,
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "center",
-                              bgcolor: "#fffded",
-                            }}
-                          >
-                            <Typography
-                              variant="h6"
-                              component="h3"
-                              sx={{ fontWeight: 700, color: "#3a4d39" }}
-                            >
-                              {deal.title}
-                            </Typography>
-                            <Typography
-                              variant="body1"
-                              sx={{ color: "#666", mb: 2 }}
-                            >
-                              {deal.description}
-                            </Typography>
-                            <Button
-                              variant="outlined"
-                              sx={{
-                                borderColor: "#ffa500",
-                                color: "#D46F12",
-                                "&:hover": {
-                                  bgcolor: "#ffa500",
-                                  color: "white",
-                                },
-                                fontWeight: 500,
-                                alignSelf: "flex-start",
-                                borderRadius: "8px",
+                                display: "flex",
+                                flexDirection: { xs: "column", sm: "row" },
                               }}
                             >
-                              Get Deal
-                            </Button>
-                          </CardContent>
-                        </Card>
+                              <Box
+                                sx={{
+                                  width: { xs: "100%", sm: "40%" },
+                                  position: "relative",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                  <Box
+                                    component="img"
+                                    src={deal.image}
+                                    sx={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                              </Box>
+
+                              <CardContent
+                                sx={{
+                                  flexGrow: 1,
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  bgcolor: "#fffded",
+                                }}
+                              >
+                                <Typography
+                                  variant="h6"
+                                  component="h3"
+                                  sx={{ fontWeight: 700, color: "#3a4d39" }}
+                                >
+                                  {deal.title}
+                                </Typography>
+                                <Typography
+                                  variant="body1"
+                                  sx={{ color: "#666", mb: 2 }}
+                                >
+                                  {deal.description}
+                                </Typography>
+                                <motion.div
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <Button
+                                    variant="outlined"
+                                    sx={{
+                                      borderColor: "#ffa500",
+                                      color: "#D46F12",
+                                      "&:hover": {
+                                        bgcolor: "#ffa500",
+                                        color: "white",
+                                      },
+                                      fontWeight: 500,
+                                      alignSelf: "flex-start",
+                                      borderRadius: "8px",
+                                    }}
+                                  >
+                                    Get Deal
+                                  </Button>
+                                </motion.div>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        </motion.div>
                       </Grid>
                     ))}
                   </Grid>
                 </Box>
+              </motion.div>
 
-                {/* Popular Restaurants */}
+              {/* Popular Restaurants with scroll animation */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1 }}
+                variants={fadeInUp}
+              >
                 <PopularRestaurants />
+              </motion.div>
 
-                {/* Footer */}
+              {/* Footer with subtle animation */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
                 <Footer />
-              </Container>
-            </Box>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </Container>
+          </Box>
+        </motion.div>
+      </Box>
     </ThemeProvider>
   );
 };

@@ -31,6 +31,7 @@ import noodles from "../assets/noodles.jpg";
 import kottu from "../assets/kottu.jpg";
 import food from "../assets/food.jpg";
 import screen from "../assets/screen.jpg";
+import { motion } from "framer-motion";
 
 interface Restaurant {
   id: string;
@@ -429,12 +430,21 @@ const PopularRestaurants: React.FC = () => {
         >
           <RestaurantIcon sx={{ mr: 1, color: "green" }} /> Popular Restaurants
         </Typography>
+        <motion.div
+                      whileHover={{ x: 5 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
+                      }}
+                    >
         <Button
           endIcon={<KeyboardArrowRightIcon />}
           sx={{ color: "green", fontWeight: 500 }}
         >
           View All
         </Button>
+        </motion.div>
       </Box>
 
       <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
