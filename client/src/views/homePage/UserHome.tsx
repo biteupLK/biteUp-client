@@ -9,13 +9,10 @@ import {
   Box,
   Card,
   CardContent,
-  Grid,
   TextField,
   InputAdornment,
   Paper,
   Stack,
-  Fade,
-  Slide,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -471,7 +468,7 @@ const Home: React.FC = () => {
                 </Paper>
               </motion.div>
 
-              {/* Featured Deals Carousel with improved animations */}
+              {/* Featured Deals Carousel with improved animations - Now using Stack */}
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -537,109 +534,109 @@ const Home: React.FC = () => {
                     </motion.div>
                   </Box>
 
-                  <Grid container spacing={3}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
                     {deals.map((deal, index) => (
-                      <Grid item xs={12} sm={6} key={index}>
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.15,
+                        }}
+                        style={{ flex: 1 }}
+                      >
                         <motion.div
-                          initial={{ opacity: 0, y: 30 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
+                          whileHover={{
+                            y: -8,
+                            boxShadow: "0 15px 30px rgba(0,0,0,0.12)",
+                          }}
                           transition={{
-                            duration: 0.5,
-                            delay: index * 0.15,
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 17,
                           }}
                         >
-                          <motion.div
-                            whileHover={{
-                              y: -8,
-                              boxShadow: "0 15px 30px rgba(0,0,0,0.12)",
-                            }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 400,
-                              damping: 17,
+                          <Card
+                            elevation={0}
+                            sx={{
+                              borderRadius: "16px",
+                              overflow: "hidden",
+                              border: "1px solid #eee",
+                              transition: "all 0.3s ease",
+                              height: "100%",
+                              display: "flex",
+                              flexDirection: { xs: "column", sm: "row" },
                             }}
                           >
-                            <Card
-                              elevation={0}
+                            <Box
                               sx={{
-                                borderRadius: "16px",
+                                width: { xs: "100%", sm: "40%" },
+                                position: "relative",
                                 overflow: "hidden",
-                                border: "1px solid #eee",
-                                transition: "all 0.3s ease",
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: { xs: "column", sm: "row" },
                               }}
                             >
                               <Box
+                                component="img"
+                                src={deal.image}
                                 sx={{
-                                  width: { xs: "100%", sm: "40%" },
-                                  position: "relative",
-                                  overflow: "hidden",
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
                                 }}
-                              >
-                                  <Box
-                                    component="img"
-                                    src={deal.image}
-                                    sx={{
-                                      width: "100%",
-                                      height: "100%",
-                                      objectFit: "cover",
-                                    }}
-                                  />
-                              </Box>
+                              />
+                            </Box>
 
-                              <CardContent
-                                sx={{
-                                  flexGrow: 1,
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  justifyContent: "center",
-                                  bgcolor: "#fffded",
-                                }}
+                            <CardContent
+                              sx={{
+                                flexGrow: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                bgcolor: "#fffded",
+                              }}
+                            >
+                              <Typography
+                                variant="h6"
+                                component="h3"
+                                sx={{ fontWeight: 700, color: "#3a4d39" }}
                               >
-                                <Typography
-                                  variant="h6"
-                                  component="h3"
-                                  sx={{ fontWeight: 700, color: "#3a4d39" }}
+                                {deal.title}
+                              </Typography>
+                              <Typography
+                                variant="body1"
+                                sx={{ color: "#666", mb: 2 }}
+                              >
+                                {deal.description}
+                              </Typography>
+                              <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <Button
+                                  variant="outlined"
+                                  sx={{
+                                    borderColor: "#ffa500",
+                                    color: "#D46F12",
+                                    "&:hover": {
+                                      bgcolor: "#ffa500",
+                                      color: "white",
+                                    },
+                                    fontWeight: 500,
+                                    alignSelf: "flex-start",
+                                    borderRadius: "8px",
+                                  }}
                                 >
-                                  {deal.title}
-                                </Typography>
-                                <Typography
-                                  variant="body1"
-                                  sx={{ color: "#666", mb: 2 }}
-                                >
-                                  {deal.description}
-                                </Typography>
-                                <motion.div
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  <Button
-                                    variant="outlined"
-                                    sx={{
-                                      borderColor: "#ffa500",
-                                      color: "#D46F12",
-                                      "&:hover": {
-                                        bgcolor: "#ffa500",
-                                        color: "white",
-                                      },
-                                      fontWeight: 500,
-                                      alignSelf: "flex-start",
-                                      borderRadius: "8px",
-                                    }}
-                                  >
-                                    Get Deal
-                                  </Button>
-                                </motion.div>
-                              </CardContent>
-                            </Card>
-                          </motion.div>
+                                  Get Deal
+                                </Button>
+                              </motion.div>
+                            </CardContent>
+                          </Card>
                         </motion.div>
-                      </Grid>
+                      </motion.div>
                     ))}
-                  </Grid>
+                  </Stack>
                 </Box>
               </motion.div>
 

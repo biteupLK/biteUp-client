@@ -11,6 +11,7 @@ import useAuth from "../src/customHooks/keycloak";
 import ErrorPage from "./views/adminPage/ErrorPage";
 import ResturantAdmin from "./views/resturant/ResturantAdmin";
 import MenuManager from "./views/resturant/MenuManager";
+import RestaurantForm from "./views/resturant/RestaurantForm";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
@@ -51,6 +52,7 @@ const AppRoutes = () => {
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/resturantadmin" element={<ResturantAdmin />} />
       <Route path="/menumanager" element={<MenuManager />} />
+      <Route path="/RestaurantForm" element={<RestaurantForm />} />
 
       <Route element={<UserBackwardProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
