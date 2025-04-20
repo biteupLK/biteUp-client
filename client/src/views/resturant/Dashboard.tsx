@@ -1,378 +1,613 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Card,
-  CardContent,
-  Grid,
   Paper,
-  Stack,
-  LinearProgress,
+  Button,
   Avatar,
-  IconButton,
+  Stack,
+  Divider,
   useTheme,
   useMediaQuery,
+  Skeleton,
 } from "@mui/material";
-import OrdersIcon from "@mui/icons-material/ShoppingCart";
-import RevenueIcon from "@mui/icons-material/AttachMoney";
-import CustomersIcon from "@mui/icons-material/Group";
-import StarIcon from "@mui/icons-material/Star";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {
+  TrendingUp,
+  RestaurantMenu,
+  People,
+  Star,
+  AttachMoney,
+  ExpandMore,
+  ArrowForward,
+} from "@mui/icons-material";
 
-import { styled } from "@mui/material/styles";
-
-// Styled components
-const StatCard = styled(Card)(({ theme }) => ({
-  borderRadius: "12px",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+// Custom color palette based on original design
+const customPalette = {
+  primary: {
+    main: "#3a4d39",
+    light: "rgba(58, 77, 57, 0.1)",
+    contrastText: "#fff",
   },
-}));
+  success: {
+    main: "#3a4d39",
+    light: "rgba(58, 77, 57, 0.1)",
+  },
+  warning: {
+    main: "#f59e0b",
+    light: "rgba(245, 158, 11, 0.1)",
+  },
+  text: {
+    primary: "#2d3748",
+    secondary: "#718096",
+  },
+};
 
-interface DashboardProps {
-  // You can add any props you might need
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  trend?: string;
+  loading?: boolean;
 }
 
-const Dashboard: React.FC<DashboardProps> = () => {
+// Dashboard Stats Card Component
+const StatCard = ({ title, value, icon, trend, loading = false }: StatCardProps) => {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderRadius: 3,
+        height: "100%",
+        backgroundColor: "white",
+        border: "1px solid",
+        borderColor: "#e2e8f0",
+        transition: "all 0.3s ease",
+        "&:hover": {
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.05)",
+          borderColor: "#3a4d39",
+        },
+      }}
+    >
+      <Box sx={{ width: '70%' }}>
+        <Typography
+          color={customPalette.text.secondary}
+          variant="body2"
+          fontWeight="medium"
+        >
+          {loading ? <Skeleton width="60%" /> : title}
+        </Typography>
+        <Typography variant="h4" fontWeight="bold" sx={{ mt: 1 }}>
+          {loading ? <Skeleton /> : value}
+        </Typography>
+        {trend && (
+          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            {loading ? (
+              <Skeleton width="80%" />
+            ) : (
+              <>
+                <TrendingUp
+                  sx={{
+                    fontSize: 16,
+                    color: trend.includes("+")
+                      ? customPalette.primary.main
+                      : "#e53e3e",
+                    mr: 0.5,
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  color={
+                    trend.includes("+") ? customPalette.primary.main : "#e53e3e"
+                  }
+                  fontWeight="bold"
+                >
+                  {trend}
+                </Typography>
+              </>
+            )}
+          </Box>
+        )}
+      </Box>
+      <Avatar
+        sx={{
+          bgcolor: loading ? '#e2e8f0' : customPalette.primary.light,
+          width: 56,
+          height: 56,
+          color: loading ? 'transparent' : customPalette.primary.main,
+        }}
+      >
+        {loading ? null : icon}
+      </Avatar>
+    </Paper>
+  );
+};
+
+// Revenue Chart Component
+const RevenueChart = ({ loading = false }: { loading?: boolean }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
-  // Mock data
-  const stats = [
-    {
-      title: "Today's Orders",
-      value: "24",
-      change: "+12%",
-      icon: <OrdersIcon />,
-      color: "secondary",
-    },
-    {
-      title: "Revenue",
-      value: "$1,245",
-      change: "+8%",
-      icon: <RevenueIcon />,
-      color: "secondary",
-    },
-    {
-      title: "Active Customers",
-      value: "156",
-      change: "+5%",
-      icon: <CustomersIcon />,
-      color: "secondary",
-    },
-    {
-      title: "Avg. Rating",
-      value: "4.8",
-      change: "+0.2",
-      icon: <StarIcon />,
-      color: "secondary",
-    },
-  ];
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        height: "100%",
+        minHeight: "300px",
+        backgroundColor: "white",
+        border: "1px solid",
+        borderColor: "#e2e8f0",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? 2 : 0,
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold">
+          {loading ? <Skeleton width={180} /> : "Revenue Overview"}
+        </Typography>
+        {loading ? (
+          <Skeleton variant="rectangular" width={120} height={36} sx={{ borderRadius: 2 }} />
+        ) : (
+          <Button
+            endIcon={<ExpandMore />}
+            size="small"
+            sx={{
+              color: customPalette.text.secondary,
+              border: "1px solid",
+              borderColor: "#e2e8f0",
+              borderRadius: 2,
+              "&:hover": {
+                borderColor: customPalette.primary.main,
+                color: customPalette.primary.main,
+              },
+            }}
+          >
+            This Week
+          </Button>
+        )}
+      </Box>
+      <Box
+        sx={{
+          height: "240px",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "rgba(58, 77, 57, 0.05)",
+          borderRadius: 2,
+        }}
+      >
+        {loading ? (
+          <Skeleton variant="rectangular" width="100%" height="100%" />
+        ) : (
+          <Typography color={customPalette.text.secondary}>
+            Revenue Chart Placeholder
+          </Typography>
+        )}
+      </Box>
+    </Paper>
+  );
+};
 
-  const recentOrders = [
-    {
-      id: "#12345",
-      customer: "John Doe",
-      items: 3,
-      total: "$45.50",
-      status: "Preparing",
-      time: "12 min",
-    },
-    {
-      id: "#12346",
-      customer: "Jane Smith",
-      items: 2,
-      total: "$32.00",
-      status: "On the way",
-      time: "5 min",
-    },
-    {
-      id: "#12347",
-      customer: "Robert Johnson",
-      items: 5,
-      total: "$78.25",
-      status: "Delivered",
-      time: "22 min",
-    },
-    {
-      id: "#12348",
-      customer: "Emily Davis",
-      items: 1,
-      total: "$12.99",
-      status: "Pending",
-      time: "35 min",
-    },
-  ];
-
-  const popularItems = [
-    { name: "Cheeseburger", orders: 42, progress: 80 },
-    { name: "Chicken Wings", orders: 35, progress: 65 },
-    { name: "Margherita Pizza", orders: 28, progress: 55 },
-    { name: "Caesar Salad", orders: 22, progress: 45 },
-    { name: "Chocolate Cake", orders: 18, progress: 35 },
+// Popular Menu Items Component
+const PopularItems = ({ loading = false }: { loading?: boolean }) => {
+  const items = [
+    { name: "Spaghetti Carbonara", sales: 142, trend: "+12%" },
+    { name: "Margherita Pizza", sales: 98, trend: "+8%" },
+    { name: "Grilled Salmon", sales: 87, trend: "+15%" },
+    { name: "Caesar Salad", sales: 65, trend: "-3%" },
   ];
 
   return (
-    <Box sx={{ p: isMobile ? 1 : 3 }}>
-      {/* Welcome Header */}
-      <Box sx={{ mb: isMobile ? 2 : 4 }}>
-        <Typography variant={isMobile ? "h5" : "h4"} fontWeight="600" gutterBottom>
-          Welcome back, Restaurant Name!
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        height: "100%",
+        backgroundColor: "white",
+        border: "1px solid",
+        borderColor: "#e2e8f0",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold">
+          {loading ? <Skeleton width={140} /> : "Popular Items"}
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Here's what's happening with your restaurant today.
-        </Typography>
-      </Box>
-
-      {/* Stats Cards */}
-      <Grid container spacing={isMobile ? 1 : 3} sx={{ mb: isMobile ? 2 : 3 }}>
-        {stats.map((stat, index) => (
-          <Grid item xs={6} sm={6} md={3} key={index}>
-            <StatCard>
-              <CardContent sx={{ p: isMobile ? 1.5 : 2 }}>
-                <Stack
-                  direction={isMobile ? "column" : "row"}
-                  alignItems={isMobile ? "flex-start" : "center"}
-                  justifyContent="space-between"
-                  spacing={isMobile ? 0.5 : 0}
-                >
-                  <Box>
-                    <Typography 
-                      variant={isMobile ? "caption" : "body2"} 
-                      color="text.secondary" 
-                      gutterBottom={!isMobile}
-                    >
-                      {stat.title}
-                    </Typography>
-                    <Typography variant={isMobile ? "h6" : "h4"} fontWeight="700">
-                      {stat.value}
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <TrendingUpIcon fontSize="small" color="secondary" />
-                      <Typography variant={isMobile ? "caption" : "body2"} color="secondary.main">
-                        {stat.change}
-                      </Typography>
-                    </Stack>
-                  </Box>
-                  <Avatar
-                    sx={{
-                      bgcolor: "secondary.light",
-                      color: "secondary.main",
-                      width: isMobile ? 36 : 48,
-                      height: isMobile ? 36 : 48,
-                      mt: isMobile ? 0.5 : 0,
-                    }}
-                  >
-                    {stat.icon}
-                  </Avatar>
-                </Stack>
-              </CardContent>
-            </StatCard>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Recent Orders and Popular Items */}
-      <Grid container spacing={isMobile ? 1 : 3}>
-        <Grid item xs={12} md={8}>
-          <Paper
+        {loading ? (
+          <Skeleton width={80} />
+        ) : (
+          <Button
+            size="small"
+            endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
             sx={{
-              p: isMobile ? 1 : 3,
-              borderRadius: "12px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              color: customPalette.text.secondary,
+              "&:hover": {
+                color: customPalette.primary.main,
+              },
             }}
           >
+            View All
+          </Button>
+        )}
+      </Box>
+      <Stack spacing={2}>
+        {loading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <Box key={i}>
+                <Skeleton width="60%" height={24} />
+                <Skeleton width="40%" height={20} />
+              </Box>
+            ))}
+          </>
+        ) : (
+          items.map((item, index) => (
             <Box
+              key={index}
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                mb: 2,
               }}
             >
-              <Typography variant="h6" fontWeight="600">
-                Recent Orders
-              </Typography>
-              <IconButton size={isMobile ? "small" : "medium"}>
-                <MoreVertIcon fontSize={isMobile ? "small" : "medium"} />
-              </IconButton>
-            </Box>
-            <Box sx={{ overflowX: "auto" }}>
-              <Box component="table" sx={{ 
-                width: "100%", 
-                borderCollapse: "collapse",
-                minWidth: isMobile ? "600px" : "100%"
-              }}>
-                <thead>
-                  <tr style={{
-                    backgroundColor: "transparent",
-                    borderBottom: "1px solid rgba(0,0,0,0.1)",
-                  }}>
-                    <th style={{ 
-                      padding: isMobile ? "8px 12px" : "12px 16px", 
-                      textAlign: "left",
-                      fontSize: isMobile ? "0.75rem" : "0.875rem"
-                    }}>
-                      Order ID
-                    </th>
-                    <th style={{ 
-                      padding: isMobile ? "8px 12px" : "12px 16px", 
-                      textAlign: "left",
-                      fontSize: isMobile ? "0.75rem" : "0.875rem"
-                    }}>
-                      Customer
-                    </th>
-                    <th style={{ 
-                      padding: isMobile ? "8px 12px" : "12px 16px", 
-                      textAlign: "left",
-                      fontSize: isMobile ? "0.75rem" : "0.875rem"
-                    }}>
-                      Total
-                    </th>
-                    <th style={{ 
-                      padding: isMobile ? "8px 12px" : "12px 16px", 
-                      textAlign: "left",
-                      fontSize: isMobile ? "0.75rem" : "0.875rem"
-                    }}>
-                      Status
-                    </th>
-                    <th style={{ 
-                      padding: isMobile ? "8px 12px" : "12px 16px", 
-                      textAlign: "left",
-                      fontSize: isMobile ? "0.75rem" : "0.875rem"
-                    }}>
-                      Time
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.map((order, index) => (
-                    <tr
-                      key={index}
-                      style={{
-                        borderBottom: "1px solid rgba(0,0,0,0.05)",
-                      }}
-                    >
-                      <td style={{ 
-                        padding: isMobile ? "12px" : "16px",
-                        fontSize: isMobile ? "0.875rem" : "1rem"
-                      }}>
-                        <Typography fontWeight="500">{order.id}</Typography>
-                      </td>
-                      <td style={{ 
-                        padding: isMobile ? "12px" : "16px",
-                        fontSize: isMobile ? "0.875rem" : "1rem"
-                      }}>
-                        {order.customer}
-                      </td>
-                      <td style={{ 
-                        padding: isMobile ? "12px" : "16px",
-                        fontSize: isMobile ? "0.875rem" : "1rem"
-                      }}>
-                        <Typography fontWeight="500">{order.total}</Typography>
-                      </td>
-                      <td style={{ 
-                        padding: isMobile ? "12px" : "16px",
-                        fontSize: isMobile ? "0.875rem" : "1rem"
-                      }}>
-                        <Box
-                          component="span"
-                          sx={{
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: "12px",
-                            bgcolor:
-                              order.status === "Delivered"
-                                ? "rgba(76, 175, 80, 0.1)"
-                                : order.status === "On the way"
-                                ? "rgba(33, 150, 243, 0.1)"
-                                : order.status === "Preparing"
-                                ? "rgba(255, 152, 0, 0.1)"
-                                : "rgba(244, 67, 54, 0.1)",
-                            color:
-                              order.status === "Delivered"
-                                ? "#4CAF50"
-                                : order.status === "On the way"
-                                ? "#2196F3"
-                                : order.status === "Preparing"
-                                ? "#FF9800"
-                                : "#F44336",
-                            fontSize: isMobile ? "0.65rem" : "0.75rem",
-                            fontWeight: "600",
-                            display: "inline-block",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {order.status}
-                        </Box>
-                      </td>
-                      <td style={{ 
-                        padding: isMobile ? "12px" : "16px",
-                        fontSize: isMobile ? "0.875rem" : "1rem"
-                      }}>
-                        <Typography color="text.secondary">
-                          {order.time}
-                        </Typography>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+              <Box>
+                <Typography variant="body1" fontWeight="medium">
+                  {item.name}
+                </Typography>
+                <Typography variant="body2" color={customPalette.text.secondary}>
+                  {item.sales} orders
+                </Typography>
               </Box>
+              <Typography
+                variant="body2"
+                fontWeight="bold"
+                color={
+                  item.trend.includes("+")
+                    ? customPalette.primary.main
+                    : "#e53e3e"
+                }
+              >
+                {item.trend}
+              </Typography>
             </Box>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Paper
+          ))
+        )}
+      </Stack>
+    </Paper>
+  );
+};
+
+// Recent Orders Component
+const RecentOrders = ({ loading = false }: { loading?: boolean }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  type OrderStatus = "Completed" | "In Progress" | "Pending";
+
+  interface Order {
+    id: string;
+    customer: string;
+    time: string;
+    total: string;
+    status: OrderStatus;
+  }
+
+  const orders: Order[] = [
+    {
+      id: "#ORD-7265",
+      customer: "John Smith",
+      time: "12:45 PM",
+      total: "$124.00",
+      status: "Completed",
+    },
+    {
+      id: "#ORD-7264",
+      customer: "Emma Johnson",
+      time: "11:30 AM",
+      total: "$86.50",
+      status: "In Progress",
+    },
+    {
+      id: "#ORD-7263",
+      customer: "Michael Brown",
+      time: "10:15 AM",
+      total: "$210.75",
+      status: "Completed",
+    },
+    {
+      id: "#ORD-7262",
+      customer: "Sarah Davis",
+      time: "9:20 AM",
+      total: "$57.25",
+      status: "Pending",
+    },
+  ];
+
+  const getStatusColor = (status: OrderStatus) => {
+    switch (status) {
+      case "Completed":
+        return customPalette.primary.main;
+      case "In Progress":
+        return customPalette.warning.main;
+      case "Pending":
+        return customPalette.text.secondary;
+      default:
+        return customPalette.primary.main;
+    }
+  };
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        backgroundColor: "white",
+        border: "1px solid",
+        borderColor: "#e2e8f0",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold">
+          {loading ? <Skeleton width={140} /> : "Recent Orders"}
+        </Typography>
+        {loading ? (
+          <Skeleton width={80} />
+        ) : (
+          <Button
+            size="small"
+            endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
             sx={{
-              p: isMobile ? 1 : 3,
-              borderRadius: "12px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              color: customPalette.text.secondary,
+              "&:hover": {
+                color: customPalette.primary.main,
+              },
             }}
           >
-            <Typography variant="h6" fontWeight="600" gutterBottom>
-              Popular Items
-            </Typography>
-            <Box>
-              {popularItems.map((item, index) => (
-                <Box key={index} sx={{ mb: 2 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mb: 0.5,
-                    }}
-                  >
-                    <Typography variant={isMobile ? "body2" : "body1"}>
-                      {item.name}
-                    </Typography>
-                    <Typography variant={isMobile ? "caption" : "body2"} color="text.secondary">
-                      {item.orders} orders
-                    </Typography>
+            View All
+          </Button>
+        )}
+      </Box>
+      <Stack spacing={2} divider={<Divider flexItem />}>
+        {loading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <Box
+                key={i}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: isMobile ? 2 : 0,
+                  py: isMobile ? 0 : 1,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Skeleton variant="circular" width={40} height={40} />
+                  <Box>
+                    <Skeleton width={100} height={24} />
+                    <Skeleton width={180} height={20} />
                   </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={item.progress}
-                    sx={{
-                      height: 6,
-                      borderRadius: 3,
-                      backgroundColor: "rgba(255, 152, 0, 0.1)",
-                      "& .MuiLinearProgress-bar": {
-                        backgroundColor: "secondary.main",
-                        borderRadius: 3,
-                      },
-                    }}
-                  />
                 </Box>
-              ))}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    flexDirection: isMobile ? "column" : "row",
+                    textAlign: isMobile ? "center" : "right",
+                  }}
+                >
+                  <Skeleton width={60} height={24} />
+                  <Skeleton width={80} height={32} sx={{ borderRadius: 2 }} />
+                </Box>
+              </Box>
+            ))}
+          </>
+        ) : (
+          orders.map((order, index) => (
+            <Box
+              key={index}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexDirection: isMobile ? "column" : "row",
+                gap: isMobile ? 2 : 0,
+                py: isMobile ? 0 : 1,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: customPalette.primary.light,
+                    color: customPalette.primary.main,
+                    width: 40,
+                    height: 40,
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  {order.customer
+                    .split(" ")
+                    .map((name) => name[0])
+                    .join("")}
+                </Avatar>
+                <Box>
+                  <Typography variant="body1" fontWeight="medium">
+                    {order.id}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color={customPalette.text.secondary}
+                  >
+                    {order.customer} • {order.time}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  flexDirection: isMobile ? "column" : "row",
+                  textAlign: isMobile ? "center" : "right",
+                }}
+              >
+                <Typography variant="body1" fontWeight="medium">
+                  {order.total}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: getStatusColor(order.status),
+                    backgroundColor:
+                      order.status === "Completed"
+                        ? customPalette.primary.light
+                        : order.status === "In Progress"
+                          ? customPalette.warning.light
+                          : "rgba(113, 128, 150, 0.1)",
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 2,
+                  }}
+                >
+                  {order.status}
+                </Typography>
+              </Box>
             </Box>
-          </Paper>
-        </Grid>
-      </Grid>
+          ))
+        )}
+      </Stack>
+    </Paper>
+  );
+};
+
+// Main Dashboard Component
+const Dashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        flexGrow: 1,
+        p: isMobile ? 2 : 3,
+        backgroundColor: "#f8f9fa",
+        minHeight: "100vh",
+      }}
+    >
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          color={customPalette.primary.main}
+        >
+          {loading ? <Skeleton width={300} /> : "Restaurant Dashboard"}
+        </Typography>
+        <Typography variant="body1" color={customPalette.text.secondary}>
+          {loading ? (
+            <Skeleton width="80%" />
+          ) : (
+            "Welcome back! Here's what's happening with your restaurant today."
+          )}
+        </Typography>
+      </Box>
+
+      {/* Stat Cards */}
+      <Stack
+        direction={isMobile ? "column" : "row"}
+        spacing={3}
+        sx={{ mb: 3 }}
+        divider={isMobile ? <Divider flexItem /> : null}
+      >
+        <Box sx={{ width: isMobile ? "100%" : "25%" }}>
+          <StatCard
+            title="Today's Revenue"
+            value="$3,456"
+            icon={<AttachMoney />}
+            trend="+8% from yesterday"
+            loading={loading}
+          />
+        </Box>
+        <Box sx={{ width: isMobile ? "100%" : "25%" }}>
+          <StatCard
+            title="Total Orders"
+            value="78"
+            icon={<RestaurantMenu />}
+            trend="+12% from yesterday"
+            loading={loading}
+          />
+        </Box>
+        <Box sx={{ width: isMobile ? "100%" : "25%" }}>
+          <StatCard
+            title="Customers"
+            value="145"
+            icon={<People />}
+            trend="+5% from yesterday"
+            loading={loading}
+          />
+        </Box>
+        <Box sx={{ width: isMobile ? "100%" : "25%" }}>
+          <StatCard
+            title="Avg. Rating"
+            value="4.8"
+            icon={<Star />}
+            trend="+0.2 from last week"
+            loading={loading}
+          />
+        </Box>
+      </Stack>
+
+      {/* Charts and Tables */}
+      <Stack direction={isMobile ? "column" : "row"} spacing={3} sx={{ mb: 3 }}>
+        <Box sx={{ width: isMobile ? "100%" : "66.66%" }}>
+          <RevenueChart loading={loading} />
+        </Box>
+        <Box sx={{ width: isMobile ? "100%" : "33.33%" }}>
+          <PopularItems loading={loading} />
+        </Box>
+      </Stack>
+
+      <Box sx={{ width: "100%" }}>
+        <RecentOrders loading={loading} />
+      </Box>
     </Box>
   );
 };
