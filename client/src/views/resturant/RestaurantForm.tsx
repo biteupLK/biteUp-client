@@ -671,8 +671,8 @@ const RestaurantForm = () => {
                 <TextField
                   {...field}
                   fullWidth
-                  value={email}
-                  aria-readonly={true}
+                  // value={email}
+                  // aria-readonly={false}
                   label="Email Address"
                   error={!!errors.email}
                   helperText={errors.email?.message}
