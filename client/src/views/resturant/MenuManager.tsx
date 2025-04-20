@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
@@ -7,138 +7,74 @@ import {
   TextField,
   Button,
   Paper,
-  Grid,
+  Stack,
   Container,
   Snackbar,
   Alert,
   InputAdornment,
-  createTheme,
-  ThemeProvider,
-  styled,
 } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import getUserDetails from "../../customHooks/extractPayload";
+import DropzoneComponent from "../../components/DropzoneComponenet";
+import { addMenuItems, MenuItem } from "../../api/menuItemApi";
 
-// TypeScript interfaces
-interface MenuItemFormData {
-  name: string;
-  description: string;
-  price: string;
-  image: FileList;
-}
-
-// Custom theme with your colors
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#3a4d39", // Dark green
-    },
-    secondary: {
-      main: "#ffa500", // Orange
-    },
-    background: {
-      default: "#ffffff", // White
-    },
-  },
-  typography: {
-    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-    h4: {
-      fontWeight: 600,
-      color: "#3a4d39",
-    },
-    h6: {
-      fontWeight: 600,
-      color: "#3a4d39",
-    },
-  },
-});
-
-// Styled components
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
-
-const ImagePreview = styled("img")({
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-  borderRadius: "4px",
-});
-
-const MenuManager: React.FC = () => {
+export default function AddMenuItem() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+  const [files, setFiles] = useState<File[]>([]);
   const queryClient = useQueryClient();
+  const userDetails = getUserDetails();
+  const email = userDetails?.email;
 
   const {
     control,
-    register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<MenuItemFormData>();
-
-  // Mock API call to add a menu item
-  const addMenuItem = async (data: FormData): Promise<any> => {
-    // In a real app, this would be an API call
-    console.log("Adding menu item:", data);
-    return new Promise((resolve) => setTimeout(() => resolve(data), 500));
-  };
-
-  const mutation = useMutation({
-    mutationFn: addMenuItem,
-    onSuccess: () => {
-      // Invalidate and refetch queries that could be affected
-      queryClient.invalidateQueries({ queryKey: ["menuItems"] });
-      reset();
-      setImagePreview(null);
-      setOpenSnackbar(true);
-    },
-  });
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const onSubmit: SubmitHandler<MenuItemFormData> = (data) => {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("description", data.description);
-    formData.append("price", data.price);
-    if (data.image[0]) {
-      formData.append("image", data.image[0]);
-    }
-
-    mutation.mutate(formData);
-  };
-
-  const handleReset = () => {
-    reset();
-    setImagePreview(null);
-  };
+  } = useForm<MenuItem>();
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
+  const { mutate: createMenuItemMutation, isPending } = useMutation({
+    mutationFn: addMenuItems,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["menuItems"] });
+      setSnackbarMessage(data.message);
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+    },
+    onError: () => {
+      setSnackbarMessage("Failed to add Menu Item. Please try again.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    },
+  });
+
+  const resetForm = () => {
+    reset();
+    setFiles([]);
+    setImagePreview(null);
+  };
+
+  const handleSubmitMenuItem = (data: MenuItem) => {
+    const submitData: MenuItem = {
+      ...data,
+      restaurantEmail: email!,
+      image: files,
+    };
+    createMenuItemMutation(submitData);
+    resetForm();
+  };
+
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 4 }}>
         <Container maxWidth="md">
           <Box mb={4}>
@@ -157,54 +93,53 @@ const MenuManager: React.FC = () => {
 
             <Box
               component="form"
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleSubmit(handleSubmitMenuItem)}
               noValidate
               sx={{ mt: 2 }}
             >
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Controller
-                    name="name"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: "Food name is required" }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Food Name"
-                        fullWidth
-                        variant="outlined"
-                        placeholder="e.g. Margherita Pizza"
-                        error={!!errors.name}
-                        helperText={errors.name?.message}
-                      />
-                    )}
-                  />
-                </Grid>
+              <Stack spacing={3}>
+                {/* Name */}
+                <Controller
+                  name="name"
+                  control={control}
+                  defaultValue=""
+                  rules={{ required: "Food name is required" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Food Name"
+                      fullWidth
+                      variant="outlined"
+                      placeholder="e.g. Margherita Pizza"
+                      error={!!errors.name}
+                      helperText={errors.name?.message}
+                    />
+                  )}
+                />
 
-                <Grid item xs={12}>
-                  <Controller
-                    name="description"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: "Description is required" }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Description"
-                        fullWidth
-                        multiline
-                        rows={3}
-                        variant="outlined"
-                        placeholder="Describe your food item..."
-                        error={!!errors.description}
-                        helperText={errors.description?.message}
-                      />
-                    )}
-                  />
-                </Grid>
+                {/* Description */}
+                <Controller
+                  name="description"
+                  control={control}
+                  defaultValue=""
+                  rules={{ required: "Description is required" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Description"
+                      fullWidth
+                      multiline
+                      rows={3}
+                      variant="outlined"
+                      placeholder="Describe your food item..."
+                      error={!!errors.description}
+                      helperText={errors.description?.message}
+                    />
+                  )}
+                />
 
-                <Grid item xs={12} sm={6}>
+                {/* Price and Image Upload in a row */}
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Controller
                     name="price"
                     control={control}
@@ -233,78 +168,56 @@ const MenuManager: React.FC = () => {
                       />
                     )}
                   />
-                </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <input
-                    {...register("image", { required: "Image is required" })}
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                  />
-                  <Button
-                    component="label"
-                    htmlFor="image-upload"
-                    variant="outlined"
-                    startIcon={<CloudUploadIcon />}
-                    sx={{ height: "56px", width: "100%" }}
-                  >
-                    Upload Image
-                  </Button>
-                  {errors.image && (
-                    <Typography
-                      color="error"
-                      variant="caption"
-                      sx={{ display: "block", mt: 1 }}
-                    >
-                      {errors.image.message}
-                    </Typography>
-                  )}
-                </Grid>
+                  <Box sx={{ width: "100%" }}>
+                    <DropzoneComponent
+                      files={files}
+                      setFiles={setFiles}
+                      dropzoneLabel={"Add Menu Item Image"}
+                    />
+                  </Box>
+                </Stack>
 
                 {imagePreview && (
-                  <Grid item xs={12}>
+                  <Box>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>
                       Image Preview:
                     </Typography>
                     <Box
+                      component="img"
+                      src={imagePreview}
+                      alt="Preview"
                       sx={{
                         height: 200,
                         width: 200,
                         border: "1px solid #ddd",
                         borderRadius: 1,
                       }}
-                    >
-                      <ImagePreview src={imagePreview} alt="Preview" />
-                    </Box>
-                  </Grid>
+                    />
+                  </Box>
                 )}
 
-                <Grid item xs={12}>
-                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      startIcon={<SaveIcon />}
-                      disabled={mutation.isPending}
-                    >
-                      {mutation.isPending ? "Adding..." : "Add Menu Item"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="contained"
-                      color="secondary"
-                      startIcon={<RestartAltIcon />}
-                      onClick={handleReset}
-                    >
-                      Reset
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
+                {/* Buttons */}
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    startIcon={<SaveIcon />}
+                    disabled={isPending}
+                  >
+                    {isPending ? "Adding..." : "Add Menu Item"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    startIcon={<RestartAltIcon />}
+                    onClick={resetForm}
+                  >
+                    Reset
+                  </Button>
+                </Box>
+              </Stack>
             </Box>
           </Paper>
 
@@ -325,20 +238,17 @@ const MenuManager: React.FC = () => {
 
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={5000}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
         >
-          Menu item added successfully!
+          {snackbarMessage}
         </Alert>
       </Snackbar>
-    </ThemeProvider>
+    </>
   );
-};
-
-export default MenuManager;
+}
