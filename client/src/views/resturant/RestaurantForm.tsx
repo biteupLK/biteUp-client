@@ -131,11 +131,6 @@ const RestaurantForm = () => {
       };
 
       document.head.appendChild(script);
-
-      return () => {
-        document.head.removeChild(script);
-        delete window.initMap;
-      };
     }
   }, [googleMapsLoaded]);
 
@@ -542,17 +537,23 @@ const RestaurantForm = () => {
               <Controller
                 name="latitude"
                 control={control}
-                render={({ field }) => <input type="hidden" {...field} />}
+                render={({ field }) => (
+                  <input type="hidden" {...field} value={field.value || ""} />
+                )}
               />
               <Controller
                 name="longitude"
                 control={control}
-                render={({ field }) => <input type="hidden" {...field} />}
+                render={({ field }) => (
+                  <input type="hidden" {...field} value={field.value || ""} />
+                )}
               />
               <Controller
                 name="placeId"
                 control={control}
-                render={({ field }) => <input type="hidden" {...field} />}
+                render={({ field }) => (
+                  <input type="hidden" {...field} value={field.value || ""} />
+                )}
               />
 
               {/* Location error message */}
@@ -671,9 +672,8 @@ const RestaurantForm = () => {
                 <TextField
                   {...field}
                   fullWidth
-                  // value={email}
-                  // aria-readonly={false}
                   label="Email Address"
+                  aria-readonly={true}
                   error={!!errors.email}
                   helperText={errors.email?.message}
                 />
