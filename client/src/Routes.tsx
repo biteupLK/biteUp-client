@@ -10,6 +10,7 @@ import Error from "./views/login/Errorpage";
 import useAuth from "../src/customHooks/keycloak";
 import ErrorPage from "./views/adminPage/ErrorPage";
 import ResturantAdmin from "./views/resturant/ResturantAdmin";
+import MenuManager from "./views/resturant/MenuManager";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
@@ -49,6 +50,8 @@ const AppRoutes = () => {
       <Route path="/error" element={<ErrorPage />} />
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/resturantadmin" element={<ResturantAdmin />} />
+      <Route path="/menumanager" element={<MenuManager />} />
+
       <Route element={<UserBackwardProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
       </Route>
