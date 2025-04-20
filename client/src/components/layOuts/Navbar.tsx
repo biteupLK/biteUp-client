@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext, MouseEvent } from "react";
+import React, { useState, createContext, useContext } from "react";
 import {
   AppBar,
   Toolbar,
@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // Added useNavigate
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 // Navbar Icons
@@ -27,9 +27,8 @@ import HomeIcon from "@mui/icons-material/Home";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
-import { FaCartShopping, FaSearchengin, FaStore } from "react-icons/fa6";
+import { FaCartShopping, FaSearchengin, FaStore, FaUserLarge } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
-import { FaUserLarge } from "react-icons/fa6";
 import useAuth from "../../customHooks/keycloak";
 
 // Import your logo here
@@ -157,7 +156,7 @@ const Navbar: React.FC = () => {
 
         <ListItem disablePadding>
           <ListItemButton
-            onClick={() => handleNavigation("/restaurantadmin", "My Restaurant")}
+            onClick={() => handleNavigation("/resturantadmin", "My Restaurant")}
             selected={activePage === "My Restaurant"}
             sx={{
               transition: "all 0.3s ease",
@@ -444,7 +443,7 @@ const Navbar: React.FC = () => {
                   {/* Restaurant Item */}
                   <MenuItem
                     onClick={() => {
-                      handleNavigation("/restaurantadmin", "My Restaurant");
+                      handleNavigation("/resturantadmin", "My Restaurant");
                       handleMenuClose();
                     }}
                     sx={{

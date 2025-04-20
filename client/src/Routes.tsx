@@ -6,10 +6,12 @@ import getUserDetails from "./customHooks/extractPayload";
 import UserProfile from "./views/userProfile/UserProfile";
 import PaymentPage from "./views/paymentPage/PayementPage";
 import UserHome from "./views/homePage/UserHome";
-import RestaurantAdminNavbar from "./components/layOuts/AdminNavbar";
 import Error from "./views/login/Errorpage";
 import useAuth from "../src/customHooks/keycloak";
 import ErrorPage from "./views/adminPage/ErrorPage";
+import ResturantAdmin from "./views/resturant/ResturantAdmin";
+import MenuManager from "./views/resturant/MenuManager";
+
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
 const UserBackwardProtectedRoute = () => {
@@ -47,7 +49,8 @@ const AppRoutes = () => {
       <Route path="/home" element={<UserHome />} />
       <Route path="/error" element={<ErrorPage />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/restaurantadmin" element={<RestaurantAdminNavbar />} />
+      <Route path="/resturantadmin" element={<ResturantAdmin />} />
+      <Route path="/menumanager" element={<MenuManager />} />
 
       <Route element={<UserBackwardProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
