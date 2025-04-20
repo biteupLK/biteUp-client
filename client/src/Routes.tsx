@@ -26,6 +26,16 @@ const UserBackwardProtectedRoute = () => {
   return <Outlet />;
 };
 
+const UserRestaurantAdmin = () => {
+  const userDetails = getUserDetails();
+  const role = userDetails?.role;
+
+  if (role != "ResAdmin") {
+    return <Navigate to="/" />;
+  }
+  return <Outlet />;
+};
+
 const AdminProtectedRoute = () => {
   const userDetails = getUserDetails();
   const role = userDetails?.role;
@@ -52,7 +62,12 @@ const AppRoutes = () => {
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/resturantadmin" element={<ResturantAdmin />} />
       <Route path="/menumanager" element={<MenuManager />} />
-      <Route path="/RestaurantForm" element={<RestaurantForm />} />
+
+
+      <Route element={<UserRestaurantAdmin />}>
+        <Route path="/RestaurantForm" element={<RestaurantForm />} />
+        <Route path="/menumanager" element={<MenuManager />} />
+      </Route>
 
       <Route element={<UserBackwardProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
