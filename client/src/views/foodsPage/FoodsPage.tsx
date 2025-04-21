@@ -1,36 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { Box, ThemeProvider } from "@mui/material";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Box, Container } from "@mui/material";
 
-import theme from "../../theme"; // Import your Poppins theme
 import Navbar from "../../components/layOuts/Navbar";
-import Loaders from "../../components/Loader.tsx";
-import { AnimatePresence } from "framer-motion";
-
-const Loader = () => {
-  return <Loaders />;
-};
+import { getMenuItems, MenuItem } from "../../api/menuItemApi";
+import MenuItemSkeleton from "../../components/SkeltonLoader";
+import MenuItemCard from "../../components/MenuCard";
 
 const FoodsPage: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const { data: menuItemData, isLoading } = useQuery({
+    queryKey: ["menuItems"],
+    queryFn: getMenuItems,
+  });
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Navbar />
-      <AnimatePresence>
-        {isLoading ? <Loader /> : 
-        
-        <Box>Foods</Box>
-        
-        }
-      </AnimatePresence>
-    </ThemeProvider>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 4,
+          }}
+        >
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <MenuItemSkeleton key={i} />
+              ))
+            : menuItemData?.map((item: MenuItem) => (
+                <MenuItemCard key={item.id} item={item} />
+              ))}
+        </Box>
+      </Container>
+    </>
   );
 };
 

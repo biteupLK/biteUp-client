@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchRestaurantData } from "../../api/restaurantApi";
 
 const Error: React.FC = () => {
-    const { data: restaurantData, isFetching: isRestFetching } = useQuery({
+    const { data: restaurantData } = useQuery({
         queryKey: ["restaurant"],
         queryFn: fetchRestaurantData,
     });

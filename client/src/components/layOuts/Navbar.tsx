@@ -27,7 +27,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
-import { FaCartShopping, FaSearchengin, FaStore, FaUserLarge } from "react-icons/fa6";
+import { FaCartShopping, FaStore, FaUserLarge } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
 import useAuth from "../../customHooks/keycloak";
 
@@ -62,7 +62,6 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate(); // Add this line
   const userDetails = getUserDetails();
   const name = userDetails?.name;
-  const role = userDetails?.role;
   const { isLogin, handleLogout } = useAuth();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -71,16 +70,6 @@ const Navbar: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleSearchClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    // Store scroll intention before navigating
-    sessionStorage.setItem("shouldScrollToSearch", "true");
-
-    // Navigate to home
-    navigate("/");
   };
 
   // Update active page based on current route

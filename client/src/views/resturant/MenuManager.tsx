@@ -12,14 +12,11 @@ import {
   Snackbar,
   Alert,
   InputAdornment,
-  Divider,
   Chip,
   Tooltip,
   alpha,
   Card,
   CardContent,
-  useTheme,
-  useMediaQuery,
   keyframes,
   Grow,
   Fade,
@@ -28,7 +25,6 @@ import {
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
@@ -63,8 +59,6 @@ export default function AddMenuItem() {
   const queryClient = useQueryClient();
   const userDetails = getUserDetails();
   const email = userDetails?.email;
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const mainColor = "#3a4d39";
   const lightMainColor = alpha(mainColor, 0.1);
@@ -362,7 +356,7 @@ export default function AddMenuItem() {
                             <Controller
                               name="price"
                               control={control}
-                              defaultValue=""
+                              defaultValue={0}
                               rules={{
                                 required: "Price is required",
                                 pattern: {
