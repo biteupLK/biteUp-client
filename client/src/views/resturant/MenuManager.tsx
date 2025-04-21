@@ -64,7 +64,7 @@ export default function AddMenuItem() {
   const userDetails = getUserDetails();
   const email = userDetails?.email;
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const mainColor = "#3a4d39";
   const lightMainColor = alpha(mainColor, 0.1);
@@ -118,7 +118,7 @@ export default function AddMenuItem() {
 
   const handleFileChange = (newFiles: File[]) => {
     setFiles(newFiles);
-    
+
     // Create image preview
     if (newFiles.length > 0) {
       const file = newFiles[0];
@@ -132,8 +132,12 @@ export default function AddMenuItem() {
     }
   };
 
-  const isFormComplete = isValid && watchedFields.name && watchedFields.description && 
-                          watchedFields.price && files.length > 0;
+  const isFormComplete =
+    isValid &&
+    watchedFields.name &&
+    watchedFields.description &&
+    watchedFields.price &&
+    files.length > 0;
 
   return (
     <Box
@@ -146,8 +150,8 @@ export default function AddMenuItem() {
     >
       <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 1 } }}>
         {/* Animated header with floating effect */}
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             mb: 4,
             animation: `${float} 6s ease-in-out infinite`,
           }}
@@ -167,7 +171,8 @@ export default function AddMenuItem() {
             Menu Management
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Create appealing menu items with detailed descriptions and high-quality images.
+            Create appealing menu items with detailed descriptions and
+            high-quality images.
           </Typography>
         </Box>
 
@@ -219,19 +224,30 @@ export default function AddMenuItem() {
                 >
                   <Stack spacing={4}>
                     {/* Form Header with completion indicator */}
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 2,
+                      }}
+                    >
                       <Typography variant="subtitle1" color="text.secondary">
                         Fill in the details below
                       </Typography>
-                      <Zoom in={true} style={{ transitionDelay: '100ms' }}>
+                      <Zoom in={true} style={{ transitionDelay: "100ms" }}>
                         <Chip
-                          label={isFormComplete ? "Ready to Submit" : "Incomplete"}
+                          label={
+                            isFormComplete ? "Ready to Submit" : "Incomplete"
+                          }
                           color={isFormComplete ? "success" : "default"}
                           size="small"
-                          sx={{ 
-                            backgroundColor: isFormComplete ? alpha(mainColor, 0.1) : undefined,
+                          sx={{
+                            backgroundColor: isFormComplete
+                              ? alpha(mainColor, 0.1)
+                              : undefined,
                             color: isFormComplete ? mainColor : undefined,
-                            fontWeight: isFormComplete ? 600 : 400
+                            fontWeight: isFormComplete ? 600 : 400,
                           }}
                         />
                       </Zoom>
@@ -241,13 +257,13 @@ export default function AddMenuItem() {
                     <Box>
                       <Typography
                         variant="body2"
-                        sx={{ 
-                          mb: 1, 
-                          color: mainColor, 
+                        sx={{
+                          mb: 1,
+                          color: mainColor,
                           fontWeight: 500,
                           display: "flex",
                           alignItems: "center",
-                          gap: 0.5
+                          gap: 0.5,
                         }}
                       >
                         <FastfoodIcon fontSize="small" /> Food Name
@@ -284,13 +300,13 @@ export default function AddMenuItem() {
                     <Box>
                       <Typography
                         variant="body2"
-                        sx={{ 
-                          mb: 1, 
-                          color: mainColor, 
+                        sx={{
+                          mb: 1,
+                          color: mainColor,
                           fontWeight: 500,
                           display: "flex",
                           alignItems: "center",
-                          gap: 0.5
+                          gap: 0.5,
                         }}
                       >
                         <DescriptionIcon fontSize="small" /> Description
@@ -330,13 +346,13 @@ export default function AddMenuItem() {
                       <Box flex={1}>
                         <Typography
                           variant="body2"
-                          sx={{ 
-                            mb: 1, 
-                            color: mainColor, 
+                          sx={{
+                            mb: 1,
+                            color: mainColor,
                             fontWeight: 500,
                             display: "flex",
                             alignItems: "center",
-                            gap: 0.5
+                            gap: 0.5,
                           }}
                         >
                           <AttachMoneyIcon fontSize="small" /> Price
@@ -379,17 +395,17 @@ export default function AddMenuItem() {
                           </div>
                         </Slide>
                       </Box>
-                      
+
                       <Box flex={1}>
                         <Typography
                           variant="body2"
-                          sx={{ 
-                            mb: 1, 
-                            color: mainColor, 
+                          sx={{
+                            mb: 1,
+                            color: mainColor,
                             fontWeight: 500,
                             display: "flex",
                             alignItems: "center",
-                            gap: 0.5
+                            gap: 0.5,
                           }}
                         >
                           <ImageIcon fontSize="small" /> Food Image
@@ -419,7 +435,10 @@ export default function AddMenuItem() {
                             textAlign: "center",
                           }}
                         >
-                          <Typography variant="subtitle2" sx={{ mb: 1, color: mainColor, fontWeight: 500 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ mb: 1, color: mainColor, fontWeight: 500 }}
+                          >
                             Image Preview
                           </Typography>
                           <Box
@@ -491,7 +510,9 @@ export default function AddMenuItem() {
                               px: 4,
                               "&:hover": {
                                 backgroundColor: "#2a3a29",
-                                animation: isFormComplete ? `${pulse} 2s infinite` : 'none',
+                                animation: isFormComplete
+                                  ? `${pulse} 2s infinite`
+                                  : "none",
                               },
                               "&:disabled": {
                                 backgroundColor: alpha(mainColor, 0.5),
@@ -549,24 +570,28 @@ export default function AddMenuItem() {
                       <InfoOutlinedIcon /> Menu Guidelines
                     </Typography>
                   </Box>
-                  
+
                   <Box sx={{ p: 3 }}>
                     {[
                       {
                         title: "High-quality images",
-                        description: "Use clear, well-lit photos of your dishes that showcase the dish's presentation and appeal.",
+                        description:
+                          "Use clear, well-lit photos of your dishes that showcase the dish's presentation and appeal.",
                       },
                       {
                         title: "Accurate descriptions",
-                        description: "Include key ingredients, preparation style, and note any allergens or dietary specifications.",
+                        description:
+                          "Include key ingredients, preparation style, and note any allergens or dietary specifications.",
                       },
                       {
                         title: "Competitive pricing",
-                        description: "Research local market prices to ensure your offerings remain competitive yet profitable.",
+                        description:
+                          "Research local market prices to ensure your offerings remain competitive yet profitable.",
                       },
                       {
                         title: "Categorize items",
-                        description: "Group similar items together (Appetizers, Mains, Desserts, etc.) for better organization.",
+                        description:
+                          "Group similar items together (Appetizers, Mains, Desserts, etc.) for better organization.",
                       },
                     ].map((item, index) => (
                       <Fade key={index} in={true} timeout={(index + 1) * 300}>
@@ -587,7 +612,7 @@ export default function AddMenuItem() {
                         </Box>
                       </Fade>
                     ))}
-                    
+
                     <Tooltip title="Following these guidelines can increase orders by up to 30%">
                       <Box
                         sx={{
@@ -606,7 +631,10 @@ export default function AddMenuItem() {
                         }}
                       >
                         <InfoOutlinedIcon color="info" fontSize="small" />
-                        <Typography variant="body2" sx={{ fontWeight: 500, color: mainColor }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 500, color: mainColor }}
+                        >
                           Well-presented menu items boost sales!
                         </Typography>
                       </Box>
@@ -614,7 +642,7 @@ export default function AddMenuItem() {
                   </Box>
                 </Paper>
               </Grow>
-              
+
               {/* Preview Card with animation */}
               <Grow in={true} timeout={1200}>
                 <Card
@@ -650,7 +678,10 @@ export default function AddMenuItem() {
                     </Typography>
                   </Box>
                   <CardContent>
-                    {watchedFields.name || watchedFields.description || watchedFields.price || imagePreview ? (
+                    {watchedFields.name ||
+                    watchedFields.description ||
+                    watchedFields.price ||
+                    imagePreview ? (
                       <Box>
                         <Box
                           sx={{
@@ -693,19 +724,34 @@ export default function AddMenuItem() {
                           <Typography variant="h6" gutterBottom>
                             {watchedFields.name || "Food Name"}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            {watchedFields.description || "Food description will appear here..."}
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 2 }}
+                          >
+                            {watchedFields.description ||
+                              "Food description will appear here..."}
                           </Typography>
-                          <Typography variant="h6" sx={{ color: mainColor, fontWeight: 600 }}>
-                            {watchedFields.price ? `Rs ${watchedFields.price}` : "Rs 0.00"}
+                          <Typography
+                            variant="h6"
+                            sx={{ color: mainColor, fontWeight: 600 }}
+                          >
+                            {watchedFields.price
+                              ? `Rs ${watchedFields.price}`
+                              : "Rs 0.00"}
                           </Typography>
                         </Box>
                       </Box>
                     ) : (
                       <Fade in={true} timeout={500}>
                         <Box sx={{ textAlign: "center", py: 4 }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
-                            Fill out the form to see a live preview of your menu item
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ fontStyle: "italic" }}
+                          >
+                            Fill out the form to see a live preview of your menu
+                            item
                           </Typography>
                         </Box>
                       </Fade>
@@ -730,7 +776,8 @@ export default function AddMenuItem() {
           severity={snackbarSeverity}
           sx={{
             width: "100%",
-            backgroundColor: snackbarSeverity === "success" ? mainColor : undefined,
+            backgroundColor:
+              snackbarSeverity === "success" ? mainColor : undefined,
             color: snackbarSeverity === "success" ? "white" : undefined,
             borderRadius: 2,
             boxShadow: "0 4px 12px rgba(0,0,0,0.15)",

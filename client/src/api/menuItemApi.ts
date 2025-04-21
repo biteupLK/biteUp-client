@@ -16,10 +16,13 @@ export type MenuItem = z.infer<typeof menuItemSchema>;
 export const addMenuItems = async (menuItem: MenuItem) => {
   const formData = new FormData();
 
-  formData.append("name", menuItem.name);
-  formData.append("description", menuItem.description);
-  formData.append("price", menuItem.price);
-  formData.append("restaurantEmail", menuItem.restaurantEmail || "");
+  const productData = {
+    name: menuItem.name,
+    description: menuItem.description,
+    price: Number(menuItem.price),
+    restaurantEmail: menuItem.restaurantEmail || "",
+  };
+  formData.append("product", JSON.stringify(productData));
 
   if (menuItem.image && menuItem.image.length > 0) {
     const file = menuItem.image[0];
@@ -28,11 +31,7 @@ export const addMenuItems = async (menuItem: MenuItem) => {
     }
   }
 
-  const res = await axios.post("/api/menu", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const res = await axios.post("/api/product", formData);
 
   return res.data;
 };
