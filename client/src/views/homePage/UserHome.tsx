@@ -67,7 +67,6 @@ const textReveal = {
 
 const Home: React.FC = () => {
   const { isMobile } = useIsMobile();
-  const [value, setValue] = React.useState(0);
   const [searchFocused, setSearchFocused] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
@@ -80,12 +79,14 @@ const Home: React.FC = () => {
   useEffect(() => {
     // Prevent scrolling during loading
     if (isLoading) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
       // Reset scroll position when loading completes
       window.scrollTo(0, 0);
       setLoadingComplete(true);
+      console.log(scrolled);
+      console.log(loadingComplete);
     }
 
     const handleHashChange = () => {
@@ -113,7 +114,7 @@ const Home: React.FC = () => {
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
       window.removeEventListener("scroll", handleScroll);
-      document.body.style.overflow = 'auto'; // Cleanup
+      document.body.style.overflow = "auto"; // Cleanup
     };
   }, [isLoading]);
 

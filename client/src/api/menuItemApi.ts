@@ -3,9 +3,11 @@ import axios from "axios";
 import { StorageFileSchema } from "../utils/StorageFiles.utils";
 
 const menuItemSchema = z.object({
+  id: z.string(),
   name: z.string(),
   description: z.string(),
-  price: z.string(),
+  price: z.number(),
+  signedUrl:z.string(),
   restaurentId: z.string(),
   restaurantEmail: z.string(),
   image: z.array(z.union([z.instanceof(File), StorageFileSchema])).optional(),
@@ -35,3 +37,8 @@ export const addMenuItems = async (menuItem: MenuItem) => {
 
   return res.data;
 };
+
+export async function getMenuItems() {
+  const res = await axios.get("/api/product");
+  return res.data;
+}

@@ -75,7 +75,6 @@ const RestaurantForm = () => {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<RestaurantSchema>({
     defaultValues: {
@@ -85,7 +84,7 @@ const RestaurantForm = () => {
       state: "",
       zipCode: "",
       phoneNumber: "",
-      email: "",
+      email: email,
       description: "",
       logo: null,
       latitude: null,
@@ -660,6 +659,7 @@ const RestaurantForm = () => {
 
             <Controller
               name="email"
+              defaultValue="email"
               control={control}
               rules={{
                 required: "Email is required",
@@ -673,7 +673,7 @@ const RestaurantForm = () => {
                   {...field}
                   fullWidth
                   label="Email Address"
-                  aria-readonly={true}
+                  inputProps={{ readOnly: true }}
                   error={!!errors.email}
                   helperText={errors.email?.message}
                 />

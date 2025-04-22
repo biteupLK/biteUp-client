@@ -24,7 +24,7 @@ const PaymentForm = () => {
     setUserDetails(details);
   }, []);
 
-  const { data: userData, isFetching: isUserDataFetching } = useQuery({
+  const { data: userData } = useQuery({
     queryKey: ["users", userDetails?.email],
     queryFn: () => fetchUserByEmail(userDetails?.email),
     enabled: !!userDetails?.email,
@@ -68,7 +68,7 @@ const PaymentForm = () => {
     const paymentData = {
       foodName,
       currency,
-      amount: parseFloat(amount),//////////
+      amount: parseFloat(amount), //////////
       email,
       customerPhone,
     };
