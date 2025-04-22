@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Typography,
@@ -13,16 +13,16 @@ import {
   List,
   ListItem,
   useTheme,
-  alpha
-} from '@mui/material';
+  alpha,
+} from "@mui/material";
 import {
   LocationOn as LocationOnIcon,
   ShoppingCart as ShoppingCartIcon,
   ArrowBack as ArrowBackIcon,
-  Storefront as StorefrontIcon
-} from '@mui/icons-material';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCartItems } from '../../api/cartApi';
+  Storefront as StorefrontIcon,
+} from "@mui/icons-material";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCartItems } from "../../api/cartApi";
 import getUserDetails from "../../customHooks/extractPayload";
 
 const CartPage: React.FC = () => {
@@ -37,7 +37,10 @@ const CartPage: React.FC = () => {
   });
 
   const totalItems = cartItems.length;
-  const subtotal = cartItems.reduce((sum: any, item: any) => sum + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce(
+    (sum: any, item: any) => sum + item.price * item.quantity,
+    0
+  );
   const deliveryFee = 50; // Assuming a fixed delivery fee
   const total = subtotal + deliveryFee;
 
@@ -45,10 +48,10 @@ const CartPage: React.FC = () => {
     <Box
       sx={{
         bgcolor: alpha(theme.palette.primary.light, 0.05),
-        minHeight: '100vh',
-        maxWidth: '800px',
-        mx: 'auto',
-        p: { xs: 2, sm: 3 }
+        minHeight: "100vh",
+        maxWidth: "800px",
+        mx: "auto",
+        p: { xs: 2, sm: 3 },
       }}
     >
       {/* Header */}
@@ -58,10 +61,10 @@ const CartPage: React.FC = () => {
           p: 2,
           mb: 3,
           borderRadius: 2,
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           bgcolor: theme.palette.background.paper,
-          position: 'relative'
+          position: "relative",
         }}
       >
         <IconButton sx={{ mr: 1 }} color="primary">
@@ -83,7 +86,7 @@ const CartPage: React.FC = () => {
           p: 2,
           mb: 3,
           borderRadius: 2,
-          bgcolor: theme.palette.background.paper
+          bgcolor: theme.palette.background.paper,
         }}
       >
         {cartItems[0] && (
@@ -93,9 +96,9 @@ const CartPage: React.FC = () => {
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                 p: 1,
                 borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <StorefrontIcon color="primary" />
@@ -128,16 +131,16 @@ const CartPage: React.FC = () => {
             sx={{
               mb: 2,
               borderRadius: 2,
-              overflow: 'hidden',
-              bgcolor: theme.palette.background.paper
+              overflow: "hidden",
+              bgcolor: theme.palette.background.paper,
             }}
           >
             <ListItem disablePadding>
-              <Stack direction="row" sx={{ width: '100%' }}>
+              <Stack direction="row" sx={{ width: "100%" }}>
                 {/* Food Image */}
                 <CardMedia
                   component="img"
-                  sx={{ width: 100, height: 100, objectFit: 'cover' }}
+                  sx={{ width: 100, height: 100, objectFit: "cover" }}
                   image={item.signedUrl}
                   alt={item.name}
                 />
@@ -147,16 +150,31 @@ const CartPage: React.FC = () => {
                   <Typography variant="subtitle1" fontWeight="600">
                     {item.name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap sx={{ mb: 1 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    noWrap
+                    sx={{ mb: 1 }}
+                  >
                     {item.description}
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight="bold" color="primary.main">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    color="primary.main"
+                  >
                     Rs {item.price.toFixed(2)}
                   </Typography>
 
                   {/* Quantity */}
-                  <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mt: 1 }}>
-                    <Typography sx={{ width: 32, textAlign: 'center' }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{ mt: 1 }}
+                  >
+                    <Typography sx={{ width: 32, textAlign: "center" }}>
                       {item.quantity}
                     </Typography>
                   </Stack>
@@ -175,7 +193,7 @@ const CartPage: React.FC = () => {
           mt: 3,
           mb: 2,
           borderRadius: 2,
-          bgcolor: theme.palette.background.paper
+          bgcolor: theme.palette.background.paper,
         }}
       >
         <Typography variant="h6" fontWeight="600" sx={{ mb: 2 }}>
@@ -190,14 +208,18 @@ const CartPage: React.FC = () => {
 
           <Stack direction="row" justifyContent="space-between">
             <Typography color="text.secondary">Delivery Fee</Typography>
-            <Typography fontWeight="500">Rs {deliveryFee.toFixed(2)}</Typography>
+            <Typography fontWeight="500">
+              Rs {deliveryFee.toFixed(2)}
+            </Typography>
           </Stack>
 
           <Divider sx={{ my: 1 }} />
 
           <Stack direction="row" justifyContent="space-between">
             <Typography fontWeight="600">Total</Typography>
-            <Typography fontWeight="700" color="primary.main">Rs {total.toFixed(2)}</Typography>
+            <Typography fontWeight="700" color="primary.main">
+              Rs {total.toFixed(2)}
+            </Typography>
           </Stack>
         </Stack>
       </Paper>
@@ -214,7 +236,7 @@ const CartPage: React.FC = () => {
           borderRadius: 2,
           fontWeight: 600,
           boxShadow: 2,
-          textTransform: 'none'
+          textTransform: "none",
         }}
       >
         Proceed to Checkout
