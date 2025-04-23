@@ -10,6 +10,7 @@ const menuItemSchema = z.object({
   signedUrl:z.string(),
   restaurentId: z.string(),
   restaurantEmail: z.string(),
+  email: z.string(),
   image: z.array(z.union([z.instanceof(File), StorageFileSchema])).optional(),
 });
 
@@ -42,3 +43,8 @@ export async function getMenuItems() {
   const res = await axios.get("/api/product");
   return res.data;
 }
+
+// export async function addToCart(data: MenuItem) {
+//   const res = await axios.post(`/api/cart`, data);
+//   return res.data;
+// }

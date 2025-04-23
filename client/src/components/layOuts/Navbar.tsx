@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 // Navbar Icons
@@ -253,14 +253,16 @@ const Navbar: React.FC = () => {
             >
               {/* Shopping Cart */}
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <IconButton
-                  sx={{
-                    display: { xs: "inline-flex", md: "inline-flex" },
-                    p: 1,
-                  }}
-                >
-                  <FaCartShopping style={{ fontSize: 25 }} />
-                </IconButton>
+                <Link to="/cart">
+                  <IconButton
+                    sx={{
+                      display: { xs: "inline-flex", md: "inline-flex" },
+                      p: 1,
+                    }}
+                  >
+                    <FaCartShopping style={{ fontSize: 25 }} />
+                  </IconButton>
+                </Link>
               </motion.div>
             </motion.div>
 
@@ -282,240 +284,237 @@ const Navbar: React.FC = () => {
             {/* Avatar / User Menu for Desktop */}
             {!isMobile && (
               <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
               >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {name ? (
+                    <Button
+                      startIcon={
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {name?.charAt(0).toUpperCase()}
+                        </Avatar>
+                      }
+                      sx={{
+                        color: "black",
+                        textTransform: "none",
+                        transition: "all 0.3s ease",
+                        borderRadius: 10,
+                        p: 2,
+                      }}
+                      onClick={handleMenuOpen}
+                    >
+                      Hi {name}
+                    </Button>
+                  ) : (
+                    <Button
+                      startIcon={
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {name?.charAt(0).toUpperCase()}
+                        </Avatar>
+                      }
+                      sx={{
+                        color: "black",
+                        textTransform: "none",
+                        transition: "all 0.3s ease",
+                        borderRadius: 10,
+                        p: 2,
+                      }}
+                      onClick={() => (window.location.href = "/home")}
+                    >
+                      Login / Signup
+                    </Button>
+                  )}
+                </motion.div>
+
+                {/* Dropdown Menu */}
                 {name ? (
-                  <Button
-                    startIcon={
-                      <Avatar sx={{ width: 24, height: 24 }}>
-                        {name?.charAt(0).toUpperCase()}
-                      </Avatar>
-                    }
-                    sx={{
-                      color: "black",
-                      textTransform: "none",
-                      transition: "all 0.3s ease",
-                      borderRadius: 10,
-                      p: 2,
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
                     }}
-                    onClick={handleMenuOpen}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    PaperProps={{
+                      elevation: 0,
+                      sx: {
+                        mt: 1,
+                        minWidth: 200,
+                        borderRadius: 2,
+                        boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
+                        "& .MuiAvatar-root": {
+                          width: 32,
+                          height: 32,
+                          ml: -0.5,
+                          mr: 1,
+                        },
+                      },
+                    }}
                   >
-                    Hi {name}
-                  </Button>
+                    <MenuItem
+                      onClick={handleMenuClose}
+                      sx={{
+                        cursor: "default",
+                        pointerEvents: "none",
+                        py: 1.5,
+                        px: 2,
+                        "&:hover": { bgcolor: "transparent" },
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          fontWeight: 500,
+                          opacity: 0.7,
+                          transition: "opacity 0.2s ease",
+                        }}
+                      >
+                        Signed in as <strong>{name}</strong>
+                      </Typography>
+                    </MenuItem>
+
+                    {/* Profile Item */}
+                    <MenuItem
+                      onClick={() => {
+                        handleNavigation("/profile", "Profile");
+                        handleMenuClose();
+                      }}
+                      sx={{
+                        borderRadius: "16px",
+                        mx: 1,
+                        my: 0.5,
+                        py: 1.5,
+                        px: 2,
+                        transition: "all 0.25s ease-out",
+                        "&:hover": {
+                          bgcolor: "action.hover",
+                          "& .menu-item-icon": {
+                            transform: "scale(1.1)",
+                            color: "primary.main",
+                          },
+                          "& .menu-item-arrow": {
+                            opacity: 1,
+                            transform: "translateX(0)",
+                          },
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <FaUserLarge
+                          fontSize="small"
+                          className="menu-item-icon"
+                        />
+                      </ListItemIcon>
+                      <Typography variant="body1">Profile</Typography>
+                      <Box
+                        className="menu-item-arrow"
+                        sx={{
+                          ml: "auto",
+                          opacity: 0,
+                          transform: "translateX(-4px)",
+                          transition: "all 0.25s ease-out",
+                          color: "text.secondary",
+                        }}
+                      >
+                        <ChevronRight fontSize="small" />
+                      </Box>
+                    </MenuItem>
+
+                    {/* Restaurant Item */}
+                    <MenuItem
+                      onClick={() => {
+                        handleNavigation("/resturantadmin", "My Restaurant");
+                        handleMenuClose();
+                      }}
+                      sx={{
+                        borderRadius: "16px",
+                        mx: 1,
+                        my: 0.5,
+                        py: 1.5,
+                        px: 2,
+                        transition: "all 0.25s ease-out",
+                        "&:hover": {
+                          bgcolor: "action.hover",
+                          "& .menu-item-icon": {
+                            transform: "scale(1.1)",
+                            color: "primary.main",
+                          },
+                          "& .menu-item-arrow": {
+                            opacity: 1,
+                            transform: "translateX(0)",
+                          },
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <FaStore fontSize="small" className="menu-item-icon" />
+                      </ListItemIcon>
+                      <Typography variant="body1">My Restaurant</Typography>
+                      <Box
+                        className="menu-item-arrow"
+                        sx={{
+                          ml: "auto",
+                          opacity: 0,
+                          transform: "translateX(-4px)",
+                          transition: "all 0.25s ease-out",
+                          color: "text.secondary",
+                        }}
+                      >
+                        <ChevronRight fontSize="small" />
+                      </Box>
+                    </MenuItem>
+
+                    {/* Logout Item */}
+                    <MenuItem
+                      onClick={() => {
+                        handleLogout();
+                        handleMenuClose();
+                      }}
+                      sx={{
+                        borderRadius: "16px",
+                        mx: 1,
+                        my: 0.5,
+                        py: 1.5,
+                        px: 2,
+                        transition: "all 0.25s ease-out",
+                        "&:hover": {
+                          bgcolor: "error.light",
+                          color: "white",
+                          "& .menu-item-icon": {
+                            transform: "translateX(2px)",
+                            color: "white",
+                          },
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <LoginIcon
+                          fontSize="small"
+                          className="menu-item-icon"
+                          sx={{
+                            color: "text.secondary",
+                            transition: "all 0.25s ease-out",
+                          }}
+                        />
+                      </ListItemIcon>
+                      <Typography variant="body1">Logout</Typography>
+                    </MenuItem>
+                  </Menu>
                 ) : (
-                  <Button
-                    startIcon={
-                      <Avatar sx={{ width: 24, height: 24 }}>
-                        {name?.charAt(0).toUpperCase()}
-                      </Avatar>
-                    }
-                    sx={{
-                      color: "black",
-                      textTransform: "none",
-                      transition: "all 0.3s ease",
-                      borderRadius: 10,
-                      p: 2,
-                    }}
-                    onClick={() => (window.location.href = "/home")}
-                  >
-                    Login / Signup
-                  </Button>
+                  isLogin
                 )}
               </motion.div>
-            
-              {/* Dropdown Menu */}
-              {name ? (
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  PaperProps={{
-                    elevation: 0,
-                    sx: {
-                      mt: 1,
-                      minWidth: 200,
-                      borderRadius: 2,
-                      boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
-                      "& .MuiAvatar-root": {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
-                      },
-                    },
-                  }}
-                >
-                  <MenuItem
-                    onClick={handleMenuClose}
-                    sx={{
-                      cursor: "default",
-                      pointerEvents: "none",
-                      py: 1.5,
-                      px: 2,
-                      "&:hover": { bgcolor: "transparent" },
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        fontWeight: 500,
-                        opacity: 0.7,
-                        transition: "opacity 0.2s ease",
-                      }}
-                    >
-                      Signed in as <strong>{name}</strong>
-                    </Typography>
-                  </MenuItem>
-            
-                  {/* Profile Item */}
-                  <MenuItem
-                    onClick={() => {
-                      handleNavigation("/profile", "Profile");
-                      handleMenuClose();
-                    }}
-                    sx={{
-                      borderRadius: "16px",
-                      mx: 1,
-                      my: 0.5,
-                      py: 1.5,
-                      px: 2,
-                      transition: "all 0.25s ease-out",
-                      "&:hover": {
-                        bgcolor: "action.hover",
-                        "& .menu-item-icon": {
-                          transform: "scale(1.1)",
-                          color: "primary.main",
-                        },
-                        "& .menu-item-arrow": {
-                          opacity: 1,
-                          transform: "translateX(0)",
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      <FaUserLarge
-                        fontSize="small"
-                        className="menu-item-icon"
-                      />
-                    </ListItemIcon>
-                    <Typography variant="body1">Profile</Typography>
-                    <Box
-                      className="menu-item-arrow"
-                      sx={{
-                        ml: "auto",
-                        opacity: 0,
-                        transform: "translateX(-4px)",
-                        transition: "all 0.25s ease-out",
-                        color: "text.secondary",
-                      }}
-                    >
-                      <ChevronRight fontSize="small" />
-                    </Box>
-                  </MenuItem>
-            
-                  {/* Restaurant Item */}
-                  <MenuItem
-                    onClick={() => {
-                      handleNavigation("/resturantadmin", "My Restaurant");
-                      handleMenuClose();
-                    }}
-                    sx={{
-                      borderRadius: "16px",
-                      mx: 1,
-                      my: 0.5,
-                      py: 1.5,
-                      px: 2,
-                      transition: "all 0.25s ease-out",
-                      "&:hover": {
-                        bgcolor: "action.hover",
-                        "& .menu-item-icon": {
-                          transform: "scale(1.1)",
-                          color: "primary.main",
-                        },
-                        "& .menu-item-arrow": {
-                          opacity: 1,
-                          transform: "translateX(0)",
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      <FaStore
-                        fontSize="small"
-                        className="menu-item-icon"
-                      />
-                    </ListItemIcon>
-                    <Typography variant="body1">My Restaurant</Typography>
-                    <Box
-                      className="menu-item-arrow"
-                      sx={{
-                        ml: "auto",
-                        opacity: 0,
-                        transform: "translateX(-4px)",
-                        transition: "all 0.25s ease-out",
-                        color: "text.secondary",
-                      }}
-                    >
-                      <ChevronRight fontSize="small" />
-                    </Box>
-                  </MenuItem>
-            
-                  {/* Logout Item */}
-                  <MenuItem
-                    onClick={() => {
-                      handleLogout();
-                      handleMenuClose();
-                    }}
-                    sx={{
-                      borderRadius: "16px",
-                      mx: 1,
-                      my: 0.5,
-                      py: 1.5,
-                      px: 2,
-                      transition: "all 0.25s ease-out",
-                      "&:hover": {
-                        bgcolor: "error.light",
-                        color: "white",
-                        "& .menu-item-icon": {
-                          transform: "translateX(2px)",
-                          color: "white",
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      <LoginIcon
-                        fontSize="small"
-                        className="menu-item-icon"
-                        sx={{
-                          color: "text.secondary",
-                          transition: "all 0.25s ease-out",
-                        }}
-                      />
-                    </ListItemIcon>
-                    <Typography variant="body1">Logout</Typography>
-                  </MenuItem>
-                </Menu>
-              ) : (
-                isLogin
-              )}
-            </motion.div>
             )}
           </Box>
         </Toolbar>

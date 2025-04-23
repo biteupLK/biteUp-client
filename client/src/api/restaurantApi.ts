@@ -29,6 +29,6 @@ export async function fetchRestaurantData() {
 }
 
 export async function addRestaurant(data: RestaurantSchema) {
-    const res = await axios.post("/api/restaurant", data);
+    const res = await axios.post("/api/restaurant/create", data);
     return res.data;
 }
