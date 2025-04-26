@@ -416,46 +416,6 @@ export default function AddMenuItem() {
                       </Box>
                     </Stack>
 
-                    {/* Image Preview with animation */}
-                    {imagePreview && (
-                      <Fade in={!!imagePreview} timeout={1000}>
-                        <Box
-                          sx={{
-                            mt: 2,
-                            p: 2,
-                            border: `1px solid ${alpha(mainColor, 0.3)}`,
-                            borderRadius: 2,
-                            backgroundColor: alpha(mainColor, 0.05),
-                            textAlign: "center",
-                          }}
-                        >
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ mb: 1, color: mainColor, fontWeight: 500 }}
-                          >
-                            Image Preview
-                          </Typography>
-                          <Box
-                            component="img"
-                            src={imagePreview}
-                            alt="Preview"
-                            sx={{
-                              height: 200,
-                              width: "auto",
-                              maxWidth: "100%",
-                              borderRadius: 2,
-                              objectFit: "cover",
-                              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                              transition: "transform 0.3s ease",
-                              "&:hover": {
-                                transform: "scale(1.02)",
-                              },
-                            }}
-                          />
-                        </Box>
-                      </Fade>
-                    )}
-
                     {/* Form Actions with pulse animation on submit when ready */}
                     <Box
                       sx={{

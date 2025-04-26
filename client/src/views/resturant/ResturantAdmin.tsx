@@ -178,20 +178,14 @@ const accounts = [
     name: "Bharat Kashyap",
     email: "bharatkashyap@outlook.com",
     image: "https://avatars.githubusercontent.com/u/19550456",
+    color: "#f28644", 
     projects: [
       {
         id: 3,
         title: "Project X",
       },
     ],
-  },
-  {
-    id: 2,
-    name: "Bharat MUI",
-    email: "bharat@mui.com",
-    color: "#8B4513", // Brown color
-    projects: [{ id: 4, title: "Project A" }],
-  },
+  }
 ];
 
 function SidebarFooterAccountPopover() {
@@ -300,7 +294,7 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
-const demoSession = {
+const resAdminSession = {
   user: {
     name: "Bharat Kashyap",
     email: "bharatkashyap@outlook.com",
@@ -319,11 +313,11 @@ export default function DashboardLayoutAccountSidebar() {
     };
   }, [pathname]);
 
-  const [session, setSession] = React.useState<Session | null>(demoSession);
+  const [session, setSession] = React.useState<Session | null>(resAdminSession);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setSession(resAdminSession);
       },
       signOut: () => {
         setSession(null);
