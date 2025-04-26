@@ -7,7 +7,7 @@ const CartSchema = z.object({
   name: z.string(),
   description: z.string(),
   price: z.number(),
-  signedUrl:z.string(),
+  signedUrl: z.string(),
   restaurentId: z.string(),
   restaurantEmail: z.string(),
   email: z.string(),
@@ -23,6 +23,6 @@ export async function addToCart(data: Cart) {
 }
 
 export async function fetchCartItems(email: String) {
-    const res = await axios.get(`/api/cart/${email}`);
-    return res.data;
-  }
+  const res = await axios.get(`/api/cart/${email}`);
+  return res.data;
+}
