@@ -7,7 +7,7 @@ import { createPayment } from "../../api/paymentApi";
 import { fetchUserByEmail } from "../../api/userApi";
 import getUserDetails from "../../customHooks/extractPayload";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PAYEMENT_KEY);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PAYMENT_KEY);
 
 const PaymentForm = () => {
   const stripe = useStripe();
