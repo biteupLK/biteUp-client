@@ -24,7 +24,7 @@ import {
 // Custom color palette based on original design
 const customPalette = {
   primary: {
-    main: "#3a4d39",
+    main: "surface",
     light: "rgba(58, 77, 57, 0.1)",
     contrastText: "#fff",
   },
