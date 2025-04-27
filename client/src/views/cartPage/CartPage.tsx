@@ -74,7 +74,8 @@ const CartPage: React.FC = () => {
       amount: item.price,
       email,
       customerPhone: item.phoneNumber,
-      signedUrl: item.signedUrl, // ✅ include the image URL here
+      signedUrl: item.signedUrl,
+      restaurantEmail: item.restaurantEmail
     };
     paymentMutation(paymentData);
   };

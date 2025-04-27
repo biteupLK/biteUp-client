@@ -98,3 +98,8 @@ export async function fetchMyOrders(email: string) {
   const res = await axios.get<CheckoutEvents>(`/api/payment/${email}/get`);
   return res.data;
 }
+
+export async function fetchRestaurantOrders(email: string) {
+  const res = await axios.get<CheckoutEvents>(`/api/payment/${email}/get-restaurant-order`);
+  return res.data;
+}
