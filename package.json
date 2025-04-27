@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "@stomp/stompjs": "^7.1.1",
-    "ws": "^8.18.1"
-  },
-  "devDependencies": {
-    "@types/ws": "^8.18.1"
-  }
-}
