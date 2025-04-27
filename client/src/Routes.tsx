@@ -62,13 +62,13 @@ const AppRoutes = () => {
       <Route path="/home" element={<UserHome />} />
       <Route path="/error" element={<ErrorPage />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/resturantadmin" element={<ResturantAdmin />} />
+      <Route path="/resturantAdmin" element={<ResturantAdmin />} />
       <Route path="/menumanager" element={<MenuManager />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/myOrders" element={<PaidOrders />} />
 
       <Route element={<UserRestaurantAdmin />}>
-        <Route path="/RestaurantForm" element={<RestaurantForm />} />
+        <Route path="/restaurantForm" element={<RestaurantForm />} />
         <Route path="/menumanager" element={<MenuManager />} />
       </Route>
 
