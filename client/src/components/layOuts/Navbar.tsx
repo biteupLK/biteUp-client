@@ -31,6 +31,8 @@ import { FaCartShopping, FaStore, FaUserLarge } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
 import useAuth from "../../customHooks/keycloak";
 
+import { checkRestaurantEmail } from "../../api/restaurantApi"; // Import your API function here
+
 // Import your logo here
 import logo from "../../assets/logo/biteUpLogo.png";
 import getUserDetails from "../../customHooks/extractPayload";
@@ -48,6 +50,10 @@ const NavContext = createContext<NavContextType>({
   activePage: "Home",
   setActivePage: () => {},
 });
+
+//resturuant first check
+const userDetails = getUserDetails();
+const email = userDetails?.email;
 
 // Custom hook to use navigation context
 export const useNavContext = () => useContext(NavContext);
@@ -145,7 +151,31 @@ const Navbar: React.FC = () => {
 
         <ListItem disablePadding>
           <ListItemButton
-            onClick={() => handleNavigation("/resturantadmin", "My Restaurant")}
+            onClick={async () => {
+              try {
+
+                if (!email) {
+                  // If no email found, redirect to login
+                  handleNavigation("/restaurantForm", "Login");
+                  return;
+                }
+
+                // Check if restaurant exists for this email
+                const restaurantExists = await checkRestaurantEmail(email);
+
+                if (restaurantExists) {
+                  // Redirect to dashboard if restaurant exists
+                  handleNavigation("/resturantAdmin", "Dashboard");
+                } else {
+                  // Redirect to login form if no restaurant exists
+                  handleNavigation("/restaurantForm", "Login");
+                }
+              } catch (error) {
+                console.error("Error checking restaurant:", error);
+                // Handle error by redirecting to login
+                handleNavigation("/loginform", "Login");
+              }
+            }}
             selected={activePage === "My Restaurant"}
             sx={{
               transition: "all 0.3s ease",
@@ -155,9 +185,9 @@ const Navbar: React.FC = () => {
             }}
           >
             <ListItemIcon>
-              <FaStore />{" "}
+              <FaStore />
             </ListItemIcon>
-            <ListItemText primary="My Restaurant" />{" "}
+            <ListItemText primary="My Restaurant" />
           </ListItemButton>
         </ListItem>
 
@@ -433,9 +463,32 @@ const Navbar: React.FC = () => {
 
                     {/* Restaurant Item */}
                     <MenuItem
-                      onClick={() => {
-                        handleNavigation("/resturantadmin", "My Restaurant");
-                        handleMenuClose();
+                      onClick={async () => {
+                        try {
+                          handleMenuClose(); // Close the menu immediately
+
+                          if (!email) {
+                            // If no email found, redirect to login
+                            handleNavigation("/restaurantForm", "Login");
+                            return;
+                          }
+
+                          // Check if restaurant exists for this email
+                          const restaurantExists =
+                            await checkRestaurantEmail(email);
+
+                          if (restaurantExists) {
+                            // Redirect to dashboard if restaurant exists
+                            handleNavigation("/resturantAdmin", "Dashboard");
+                          } else {
+                            // Redirect to login form if no restaurant exists
+                            handleNavigation("/restaurantForm", "Login");
+                          }
+                        } catch (error) {
+                          console.error("Error checking restaurant:", error);
+                          // Handle error by redirecting to login
+                          handleNavigation("/", "Login");
+                        }
                       }}
                       sx={{
                         borderRadius: "16px",
