@@ -1,16 +1,17 @@
-import { Typography, Box } from "@mui/material";
+import React from "react";
 
-const Orders = () => {
+const PaymentDetails: React.FC = () => {
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Orders
-      </Typography>
-      <Typography>
-        View and manage incoming orders here.
-      </Typography>
-    </Box>
+    <div>
+      <iframe
+        src="/paymentDetails.html"
+        width="100%"
+        height="500px"
+        style={{ border: "none" }}
+        title="Payment Details"
+      ></iframe>
+    </div>
   );
 };
 
-export default Orders;
+export default PaymentDetails;

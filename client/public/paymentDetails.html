@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Restaurant Orders</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .order {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+      }
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .order-id {
+        color: #666;
+        font-size: 14px;
+      }
+      .status {
+        font-weight: bold;
+        color: green;
+      }
+      .customer-info,
+      .order-info {
+        margin-top: 10px;
+      }
+      .address {
+        margin-top: 5px;
+        color: #555;
+      }
+      button {
+        padding: 8px 15px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+      button:disabled {
+        background-color: #cccccc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Restaurant Orders</h1>
+    <button id="connectBtn">Connect to Orders</button>
+    <div id="ordersContainer"></div>
+
+    <script>
+      const connectBtn = document.getElementById("connectBtn");
+      const ordersContainer = document.getElementById("ordersContainer");
+      let stompClient = null;
+      const restaurantEmail = "pizzahut@katugasthota.biteup.lk";
+      let messageInterval = null;
+
+      function connect() {
+        const socket = new SockJS("http://localhost:8084/ws");
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+          console.log("Connected to WebSocket server.");
+          connectBtn.disabled = true;
+          ordersContainer.innerHTML = "<p>Connected. Waiting for orders...</p>";
+
+          stompClient.subscribe("/topic/restaurant-order", function (message) {
+            const response = JSON.parse(message.body);
+            displayOrders(response);
+          });
+
+          stompClient.subscribe("/topic/response", function (message) {
+            const responseMessage = JSON.parse(message.body);
+            console.log("Server response:", responseMessage);
+          });
+
+          // Send immediately
+          sendRestaurantOrderRequest();
+
+          // Keep sending every 5 seconds
+          messageInterval = setInterval(sendRestaurantOrderRequest, 1000);
+        });
+      }
+
+      function sendRestaurantOrderRequest() {
+        if (stompClient && stompClient.connected) {
+          const emailPayload = `"${restaurantEmail}"`; // must include quotes around email
+          const frame =
+            "SEND\n" +
+            "destination:/app/get-restaurant-order\n" +
+            `content-length:${emailPayload.length}\n\n` +
+            `${emailPayload}\u0000`;
+
+          stompClient.ws.send(frame); // 🔥 Send the frame directly to websocket, RAW
+          console.log("Sent restaurant order request frame to server.");
+        }
+      }
+
+      function displayOrders(response) {
+        if (response.orders && response.orders.length > 0) {
+          ordersContainer.innerHTML = "";
+
+          response.orders.forEach((order) => {
+            const orderDiv = document.createElement("div");
+            orderDiv.className = "order";
+
+            const paymentData = order.paymentData || {};
+            const customer = paymentData.customer || {};
+            const address = customer.address || {};
+            const orderDetails = paymentData.orderDetails || {};
+
+            orderDiv.innerHTML = `
+                <div class="order-header">
+                  <div>
+                    <h3>${orderDetails.foodName || "Unknown Item"}</h3>
+                    <div class="order-id">Order ID: ${order.id}</div>
+                  </div>
+                  <div class="status">${
+                    paymentData.paymentStatus || "Unknown Status"
+                  }</div>
+                </div>
+      
+                <div class="order-info">
+                  <p><strong>Amount:</strong> ${paymentData.amount || "0"} ${
+              paymentData.currency || ""
+            }</p>
+                  <p><strong>Payment Intent:</strong> ${
+                    paymentData.paymentIntent || ""
+                  }</p>
+                </div>
+      
+                <div class="customer-info">
+                  <h4>Customer Details</h4>
+                  <p><strong>Name:</strong> ${customer.name || "Unknown"}</p>
+                  <p><strong>Email:</strong> ${customer.email || ""}</p>
+                  <p><strong>Phone:</strong> ${orderDetails.phone || ""}</p>
+      
+                  <div class="address">
+                    <strong>Address:</strong><br>
+                    ${address.line1 || ""} ${address.line2 || ""}<br>
+                    ${address.city || ""}, ${address.postalCode || ""}<br>
+                    ${address.country || ""}
+                  </div>
+                </div>
+              `;
+
+            ordersContainer.appendChild(orderDiv);
+          });
+        } else {
+          ordersContainer.innerHTML =
+            "<p>No orders found for this restaurant.</p>";
+        }
+      }
+
+      connectBtn.addEventListener("click", connect);
+    </script>
+  </body>
+</html>
