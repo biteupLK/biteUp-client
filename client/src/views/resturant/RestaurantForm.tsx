@@ -1,4 +1,3 @@
-// RestaurantStepperForm.tsx
 import { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
@@ -17,9 +16,9 @@ import {
   Stepper,
   Step,
   StepLabel,
-  StepContent,
   Card,
   CardContent,
+  StepConnector,
 } from "@mui/material";
 import {
   CloudUpload as CloudUploadIcon,
@@ -28,10 +27,17 @@ import {
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
   Check as CheckIcon,
+  CheckCircleOutlineOutlined,
+  InfoOutlined,
+  CheckCircleOutline,
+  ErrorOutline,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { addRestaurant, RestaurantSchema } from "../../api/restaurantApi";
 import getUserDetails from "../../customHooks/extractPayload";
+import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logo/biteUpLogo.png";
+import { motion } from "framer-motion";
 
 // Custom styled component for file upload
 const VisuallyHiddenInput = styled("input")({
@@ -88,11 +94,14 @@ const steps = [
 ];
 
 const RestaurantStepperForm = () => {
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [predictions, setPredictions] = useState<any[]>([]);
@@ -102,12 +111,15 @@ const RestaurantStepperForm = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
-  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  
+  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(
+    null
+  );
+  const autocompleteServiceRef =
+    useRef<google.maps.places.AutocompleteService | null>(null);
+
   const userDetails = getUserDetails();
   const email = userDetails?.email;
-  
+
   const {
     control,
     handleSubmit,
@@ -162,7 +174,13 @@ const RestaurantStepperForm = () => {
         markerRef.current.setMap(null);
         markerRef.current = null;
       }
+
+      // Redirect to dashboard after 2 seconds (give time to see success message)
+      setTimeout(() => {
+        navigate("/resturantAdmin"); // or whatever your dashboard route is
+      }, 2000);
     },
+
     onError: (error) => {
       setSnackbarMessage("Failed to add restaurant. Please try again.");
       setSnackbarSeverity("error");
@@ -189,7 +207,12 @@ const RestaurantStepperForm = () => {
 
   // Initialize map after API loads and step is active
   useEffect(() => {
-    if (googleMapsLoaded && mapRef.current && !mapInstanceRef.current && activeStep === 2) {
+    if (
+      googleMapsLoaded &&
+      mapRef.current &&
+      !mapInstanceRef.current &&
+      activeStep === 2
+    ) {
       // Default to a central location (can be customized)
       const defaultLocation = { lat: 40.7128, lng: -74.006 }; // New York
 
@@ -205,8 +228,11 @@ const RestaurantStepperForm = () => {
       mapInstanceRef.current = map;
 
       // Initialize Places services
-      placesServiceRef.current = new window.google.maps.places.PlacesService(map);
-      autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+      placesServiceRef.current = new window.google.maps.places.PlacesService(
+        map
+      );
+      autocompleteServiceRef.current =
+        new window.google.maps.places.AutocompleteService();
 
       // Handle map click to place marker
       map.addListener("click", (e: google.maps.MapMouseEvent) => {
@@ -249,11 +275,16 @@ const RestaurantStepperForm = () => {
           break;
         case 3:
           // Address step
-          setIsFormValid(!!watchAddress && !!watchCity && !!watchState && !!watchZipCode);
+          setIsFormValid(
+            !!watchAddress && !!watchCity && !!watchState && !!watchZipCode
+          );
           break;
         case 4:
           // Contact info step
-          const phoneValid = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(watchPhoneNumber || '');
+          const phoneValid =
+            /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(
+              watchPhoneNumber || ""
+            );
           setIsFormValid(phoneValid && !!email);
           break;
         case 5:
@@ -288,7 +319,7 @@ const RestaurantStepperForm = () => {
       handleSubmit(onSubmit)();
       return;
     }
-    
+
     // Move to next step
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -304,7 +335,12 @@ const RestaurantStepperForm = () => {
 
     const request = {
       placeId: prediction.place_id,
-      fields: ["geometry", "formatted_address", "address_components", "place_id"],
+      fields: [
+        "geometry",
+        "formatted_address",
+        "address_components",
+        "place_id",
+      ],
     };
 
     placesServiceRef.current.getDetails(
@@ -403,7 +439,10 @@ const RestaurantStepperForm = () => {
           streetNumber = component.long_name;
         } else if (types.includes("route")) {
           route = component.long_name;
-        } else if (types.includes("locality") || types.includes("sublocality")) {
+        } else if (
+          types.includes("locality") ||
+          types.includes("sublocality")
+        ) {
           city = component.long_name;
         } else if (types.includes("administrative_area_level_1")) {
           state = component.short_name; // Use short name for state (e.g., CA instead of California)
@@ -492,16 +531,27 @@ const RestaurantStepperForm = () => {
                   Welcome to Your Restaurant Setup
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  Before you can start using the platform, you need to complete your restaurant profile. This information will be used to create your restaurant page.
+                  Before you can start using the platform, you need to complete
+                  your restaurant profile. This information will be used to
+                  create your restaurant page.
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  This setup wizard will guide you through the process step by step. You'll need:
+                  This setup wizard will guide you through the process step by
+                  step. You'll need:
                 </Typography>
                 <ul>
-                  <Typography component="li" variant="body1">Your restaurant logo (high-quality image)</Typography>
-                  <Typography component="li" variant="body1">Basic restaurant information</Typography>
-                  <Typography component="li" variant="body1">Restaurant location and address details</Typography>
-                  <Typography component="li" variant="body1">Contact information</Typography>
+                  <Typography component="li" variant="body1">
+                    Your restaurant logo (high-quality image)
+                  </Typography>
+                  <Typography component="li" variant="body1">
+                    Basic restaurant information
+                  </Typography>
+                  <Typography component="li" variant="body1">
+                    Restaurant location and address details
+                  </Typography>
+                  <Typography component="li" variant="body1">
+                    Contact information
+                  </Typography>
                 </ul>
                 <Typography variant="body1" sx={{ mt: 2, fontWeight: "bold" }}>
                   Let's get started!
@@ -530,7 +580,11 @@ const RestaurantStepperForm = () => {
                   <img
                     src={logoPreview}
                     alt="Restaurant logo preview"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 </Box>
               )}
@@ -680,7 +734,8 @@ const RestaurantStepperForm = () => {
 
             <Stack spacing={2}>
               <Typography variant="caption" color="text.secondary">
-                Search for your restaurant or click on the map to set your location
+                Search for your restaurant or click on the map to set your
+                location
               </Typography>
 
               {/* Hidden fields for coordinates */}
@@ -721,8 +776,13 @@ const RestaurantStepperForm = () => {
             <Typography variant="subtitle1" gutterBottom>
               Confirm Address Details
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: "block" }}>
-              Please verify the address information or make corrections if needed.
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 2, display: "block" }}
+            >
+              Please verify the address information or make corrections if
+              needed.
             </Typography>
 
             {/* Restaurant Address */}
@@ -803,7 +863,11 @@ const RestaurantStepperForm = () => {
             <Typography variant="subtitle1" gutterBottom>
               Contact Information
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: "block" }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 2, display: "block" }}
+            >
               How customers will contact your restaurant
             </Typography>
 
@@ -814,7 +878,8 @@ const RestaurantStepperForm = () => {
                 rules={{
                   required: "Phone number is required",
                   pattern: {
-                    value: /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                    value:
+                      /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
                     message: "Enter a valid phone number",
                   },
                 }}
@@ -847,7 +912,10 @@ const RestaurantStepperForm = () => {
                     label="Email Address"
                     inputProps={{ readOnly: true }}
                     error={!!errors.email}
-                    helperText={errors.email?.message || "Email is pre-filled from your account"}
+                    helperText={
+                      errors.email?.message ||
+                      "Email is pre-filled from your account"
+                    }
                   />
                 )}
               />
@@ -860,9 +928,14 @@ const RestaurantStepperForm = () => {
             <Typography variant="h6" gutterBottom>
               Review Your Information
             </Typography>
-            
+
             <Card variant="outlined" sx={{ mb: 3, p: 2 }}>
-              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{ mb: 2 }}
+              >
                 {logoPreview && (
                   <Box
                     sx={{
@@ -875,7 +948,11 @@ const RestaurantStepperForm = () => {
                     <img
                       src={logoPreview}
                       alt="Restaurant logo"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
                   </Box>
                 )}
@@ -886,19 +963,26 @@ const RestaurantStepperForm = () => {
                   </Typography>
                 </Box>
               </Stack>
-              
-              <Typography variant="subtitle2" gutterBottom>Description</Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>{watchDescription}</Typography>
-              
-              <Typography variant="subtitle2" gutterBottom>Contact Information</Typography>
+
+              <Typography variant="subtitle2" gutterBottom>
+                Description
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                {watchDescription}
+              </Typography>
+
+              <Typography variant="subtitle2" gutterBottom>
+                Contact Information
+              </Typography>
               <Typography variant="body2">Phone: {watchPhoneNumber}</Typography>
               <Typography variant="body2">Email: {email}</Typography>
             </Card>
-            
+
             <Typography variant="body2" sx={{ mb: 2 }}>
-              Please review the information above. Once you submit, your restaurant profile will be created.
+              Please review the information above. Once you submit, your
+              restaurant profile will be created.
             </Typography>
-            
+
             <Typography variant="body2" sx={{ fontStyle: "italic" }}>
               You can edit this information later from your restaurant settings.
             </Typography>
@@ -910,69 +994,301 @@ const RestaurantStepperForm = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ maxWidth: 800, mx: "auto", my: 4 }}>
-      <Box sx={{ p: { xs: 2, md: 4 } }}>
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          align="center"
-          sx={{ mb: 4 }}
-        >
-          Restaurant Setup
-        </Typography>
+    <Paper
+      elevation={0}
+      sx={{
+        mx: "auto",
+        borderRadius: 4,
+        overflow: "hidden",
+        backgroundColor: "background.default",
+        maxWidth: { md: "1300px" },
+      }}
+    >
+      <Box
+        sx={{
+          p: { xs: 3, md: 6 },
+          background: "linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)",
+        }}
+      >
+        {/* Logo & Header */}
+        <Box sx={{ textAlign: "center", mb: 6 }}>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box
+              component="img"
+              src={logo}
+              alt="Logo"
+              sx={{
+                height: { xs: 70, sm: 90 },
+                maxWidth: { xs: 120, sm: "auto" },
+                mb: 3,
+                filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.08))",
+              }}
+            />
+          </motion.div>
 
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((step, index) => (
-            <Step key={step.label}>
-              <StepLabel>{step.label}</StepLabel>
-              <StepContent>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {step.description}
-                </Typography>
-                {getStepContent(index)}
-                <Box sx={{ mb: 2, mt: 3 }}>
-                  <Stack direction="row" spacing={2}>
-                    <Button
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      startIcon={<ArrowBackIcon />}
-                      variant="outlined"
+          <Typography
+            variant="h4"
+            component="h1"
+            gutterBottom
+            sx={{
+              fontWeight: 700,
+              color: "text.primary",
+              letterSpacing: "-0.5px",
+              mb: 1,
+            }}
+          >
+            Complete Your Restaurant Profile
+          </Typography>
+
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ maxWidth: "600px", mx: "auto" }}
+          >
+            Just a few steps to setup your restaurant and start managing your
+            business
+          </Typography>
+        </Box>
+
+        {/* Modern Stepper */}
+        <Box sx={{ mb: 6, px: { xs: 0, md: 2 } }}>
+          <Stepper
+            activeStep={activeStep}
+            alternativeLabel
+            connector={
+              <StepConnector
+                sx={{
+                  "& .MuiStepConnector-line": {
+                    height: 4,
+                    borderRadius: 2,
+                    border: 0,
+                    background:
+                      "linear-gradient(90deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 100%)",
+                  },
+                  "&.Mui-active .MuiStepConnector-line": {
+                    background:
+                      "linear-gradient(90deg, rgba(246, 156, 61) 0%, rgb(246, 156, 61) 50%, rgba(246, 156, 61) 100%)",
+                  },
+                  "&.Mui-completed .MuiStepConnector-line": {
+                    background:
+                      "linear-gradient(90deg, rgba(202, 135, 28) 0%, rgb(202, 135, 28) 50%, rgba(202, 135, 28) 100%)",
+                  },
+                }}
+              />
+            }
+          >
+            {steps.map((step, index) => (
+              <Step key={step.label}>
+                <StepLabel
+                  sx={{
+                    "& .MuiStepLabel-label": {
+                      mt: 1,
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      fontWeight: index <= activeStep ? 600 : 400,
+                      color:
+                        index <= activeStep ? "text.primary" : "text.secondary",
+                    },
+                  }}
+                  StepIconComponent={(props) => (
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: props.completed
+                          ? "success.main"
+                          : props.active
+                            ? "primary.main"
+                            : "rgba(0,0,0,0.06)",
+                        color:
+                          props.completed || props.active
+                            ? "#fff"
+                            : "text.secondary",
+                        boxShadow: props.active
+                          ? "0 4px 12px rgba(99,102,241,0.3)"
+                          : "none",
+                        transition: "all 0.3s ease",
+                      }}
                     >
-                      Back
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={handleNext}
-                      disabled={!isFormValid || mutation.isPending}
-                      endIcon={activeStep === steps.length - 1 ? <CheckIcon /> : <ArrowForwardIcon />}
-                    >
-                      {mutation.isPending && activeStep === steps.length - 1 ? (
-                        <CircularProgress size={24} color="inherit" />
+                      {props.completed ? (
+                        <CheckIcon fontSize="small" />
                       ) : (
-                        activeStep === steps.length - 1 ? "Submit" : "Next"
+                        <Typography variant="body2" fontWeight={600}>
+                          {props.icon}
+                        </Typography>
                       )}
-                    </Button>
-                  </Stack>
-                </Box>
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
+                    </Box>
+                  )}
+                >
+                  {step.label}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+
+        {/* Content Card */}
+        <motion.div
+          key={activeStep}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, md: 4 },
+              mb: 4,
+              borderRadius: 3,
+              backgroundColor: "background.paper",
+              border: "1px solid rgba(0,0,0,0.04)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
+            }}
+          >
+            <Box
+              sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 3 }}
+            >
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "12px",
+                  backgroundColor: "background.default",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {activeStep === steps.length - 1 ? (
+                  <CheckCircleOutlineOutlined color="primary" />
+                ) : (
+                  <InfoOutlined color="primary" />
+                )}
+              </Box>
+
+              <Box>
+                <Typography
+                  variant="h6"
+                  color="text.primary"
+                  sx={{ fontWeight: 600, mb: 0.5 }}
+                >
+                  {steps[activeStep].label}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {steps[activeStep].description}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ pt: 2 }}>{getStepContent(activeStep)}</Box>
+          </Paper>
+        </motion.div>
+
+        {/* Navigation Buttons */}
+        <Box sx={{ mb: 2, mt: 4 }}>
+          <Stack
+            direction={{ xs: "column-reverse", sm: "row" }}
+            spacing={2}
+            justifyContent="space-between"
+          >
+            <Button
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              startIcon={<ArrowBackIcon />}
+              variant="outlined"
+              size="large"
+              sx={{
+                borderRadius: 2,
+                px: 4,
+                py: 1.5,
+                textTransform: "none",
+                borderWidth: "2px",
+                "&:hover": {
+                  borderWidth: "2px",
+                },
+              }}
+            >
+              Previous
+            </Button>
+
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              disabled={!isFormValid || mutation.isPending}
+              endIcon={
+                activeStep === steps.length - 1 ? null : <ArrowForwardIcon />
+              }
+              size="large"
+              sx={{
+                borderRadius: 2,
+                px: 5,
+                py: 1.5,
+                textTransform: "none",
+                fontWeight: 600,
+                background:
+                  activeStep === steps.length - 1
+                    ? "Secondary.main"
+                    : "primary.light",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+                "&:hover": {
+                  boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+                },
+                "&:disabled": {
+                  background: "rgba(0,0,0,0.12)",
+                },
+              }}
+            >
+              {mutation.isPending && activeStep === steps.length - 1 ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : activeStep === steps.length - 1 ? (
+                "Finish Setup"
+              ) : (
+                "Next Step"
+              )}
+            </Button>
+          </Stack>
+        </Box>
       </Box>
 
+      {/* Snackbar Notification */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          {snackbarMessage}
-        </Alert>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            variant="filled"
+            sx={{
+              borderRadius: 2,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+              alignItems: "center",
+              minWidth: { xs: "300px", sm: "400px" },
+            }}
+            iconMapping={{
+              success: <CheckCircleOutline fontSize="large" />,
+              error: <ErrorOutline fontSize="large" />,
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600}>
+              {snackbarMessage}
+            </Typography>
+          </Alert>
+        </motion.div>
       </Snackbar>
     </Paper>
   );
