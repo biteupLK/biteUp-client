@@ -87,11 +87,8 @@ const Theme = createTheme({
       main: "#f28644",
       contrastText: "#ffffff",
     },
+    mode: "light", // Explicitly set to light mode
   },
-  cssVariables: {
-    colorSchemeSelector: "data-toolpad-color-scheme",
-  },
-  colorSchemes: { light: true, dark: true },
   breakpoints: {
     values: {
       xs: 0,
@@ -270,8 +267,7 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
               elevation: 0,
               sx: {
                 overflow: "visible",
-                filter: (theme) =>
-                  `drop-shadow(0px 2px 8px ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.32)"})`,
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                 mt: 1,
                 "&::before": {
                   content: '""',
