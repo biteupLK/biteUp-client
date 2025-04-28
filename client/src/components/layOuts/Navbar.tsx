@@ -51,10 +51,6 @@ const NavContext = createContext<NavContextType>({
   setActivePage: () => {},
 });
 
-//resturuant first check
-const userDetails = getUserDetails();
-const email = userDetails?.email;
-
 // Custom hook to use navigation context
 export const useNavContext = () => useContext(NavContext);
 
@@ -69,6 +65,8 @@ const Navbar: React.FC = () => {
   const userDetails = getUserDetails();
   const name = userDetails?.name;
   const { isLogin, handleLogout } = useAuth();
+  const [loading, setLoading] = useState(false);
+
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -152,28 +150,29 @@ const Navbar: React.FC = () => {
         <ListItem disablePadding>
           <ListItemButton
             onClick={async () => {
+              if (loading) return; // prevent double click
+              setLoading(true);
               try {
+                const userDetails = getUserDetails();
+                const email = userDetails?.email;
 
                 if (!email) {
-                  // If no email found, redirect to login
-                  handleNavigation("/restaurantForm", "Login");
+                  console.error("No user email found.");
+                  handleNavigation("/", "Login");
                   return;
                 }
 
-                // Check if restaurant exists for this email
                 const restaurantExists = await checkRestaurantEmail(email);
-
                 if (restaurantExists) {
-                  // Redirect to dashboard if restaurant exists
-                  handleNavigation("/resturantAdmin", "Dashboard");
+                  handleNavigation("/restaurantAdmin", "Dashboard");
                 } else {
-                  // Redirect to login form if no restaurant exists
                   handleNavigation("/restaurantForm", "Login");
                 }
               } catch (error) {
                 console.error("Error checking restaurant:", error);
-                // Handle error by redirecting to login
                 handleNavigation("/loginform", "Login");
+              } finally {
+                setLoading(false);
               }
             }}
             selected={activePage === "My Restaurant"}
@@ -181,6 +180,12 @@ const Navbar: React.FC = () => {
               transition: "all 0.3s ease",
               "&.Mui-selected": {
                 backgroundColor: "rgba(0,0,0,0.1)",
+              },
+              "&.Mui-selected:hover": {
+                backgroundColor: "rgba(0,0,0,0.15)",
+              },
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.05)",
               },
             }}
           >
@@ -465,28 +470,33 @@ const Navbar: React.FC = () => {
                     <MenuItem
                       onClick={async () => {
                         try {
-                          handleMenuClose(); // Close the menu immediately
+                          handleMenuClose(); // Close the menu immediately (optional timing)
+
+                          const userDetails = getUserDetails();
+                          const email = userDetails?.email;
 
                           if (!email) {
-                            // If no email found, redirect to login
-                            handleNavigation("/restaurantForm", "Login");
+                            console.error("No user email found.");
+                            handleNavigation("/", "Login");
                             return;
                           }
 
-                          // Check if restaurant exists for this email
                           const restaurantExists =
                             await checkRestaurantEmail(email);
 
                           if (restaurantExists) {
-                            // Redirect to dashboard if restaurant exists
-                            handleNavigation("/resturantAdmin", "Dashboard");
+                            handleNavigation("/restaurantAdmin", "Dashboard"); // typo fixed
                           } else {
-                            // Redirect to login form if no restaurant exists
-                            handleNavigation("/restaurantForm", "Login");
+                            handleNavigation(
+                              "/restaurantForm",
+                              "Setup Restaurant"
+                            ); // optional better label
                           }
                         } catch (error) {
-                          console.error("Error checking restaurant:", error);
-                          // Handle error by redirecting to login
+                          console.error(
+                            "Error checking restaurant for email:",
+                            error
+                          );
                           handleNavigation("/", "Login");
                         }
                       }}

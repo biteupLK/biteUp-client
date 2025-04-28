@@ -37,9 +37,7 @@ import getUserDetails from "../../customHooks/extractPayload";
 import { useNavigate } from "react-router-dom";
 
 //Get user dtails
-const userDetails = getUserDetails();
-const restaurantEmail = userDetails?.email;
-const restaurantName = userDetails?.name;
+
 
 function AppTitle() {
   return (
@@ -125,6 +123,7 @@ function Loader() {
 
 function RestaurantPageContent({ pathname }: { pathname: string }) {
   const [loading, setLoading] = React.useState(true);
+  
 
   React.useEffect(() => {
     // Simulate loading delay
@@ -177,68 +176,56 @@ function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   );
 }
 
-const accounts = [
-  {
-    id: 1,
-    name: restaurantName,
-    email: restaurantEmail,
-    image: "",
-    color: "#f28644", 
-    projects: [
-      {
-        id: 3,
-        title: "Project X",
-      },
-    ],
-  }
-];
+const userDetails = getUserDetails();
+const restaurantEmail = userDetails?.email;
+const restaurantName = userDetails?.name;
 
-function SidebarFooterAccountPopover() {
+function SidebarFooterAccountPopover({ accounts = [] }) {
+  const userDetails = getUserDetails();
+  const restaurantEmail = userDetails?.email;
+  const restaurantName = userDetails?.name;
+
   return (
-    <Stack direction="column">
-      <Typography variant="body2" mx={2} mt={1}>
-        Accounts
-      </Typography>
-      <MenuList>
-        {accounts.map((account) => (
-          <MenuItem
-            key={account.id}
-            component="button"
+    <Stack direction="column" sx={{ width: 250 }}>
+      {/* User Account Section */}
+      <MenuItem
+        component="div"
+        sx={{
+          justifyContent: "flex-start",
+          width: "100%",
+          columnGap: 2,
+          py: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <ListItemIcon>
+          <Avatar
             sx={{
-              justifyContent: "flex-start",
-              width: "100%",
-              columnGap: 2,
+              width: 40,
+              height: 40,
+              fontSize: "1rem",
+              bgcolor: '#f28644',
             }}
           >
-            <ListItemIcon>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  fontSize: "0.95rem",
-                  bgcolor: account.color,
-                }}
-                src={account.image ?? ""}
-                alt={account.name ?? ""}
-              >
-              </Avatar>
-            </ListItemIcon>
-            <ListItemText
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                width: "100%",
-              }}
-              primary={account.name}
-              secondary={account.email}
-              primaryTypographyProps={{ variant: "body2" }}
-              secondaryTypographyProps={{ variant: "caption" }}
-            />
-          </MenuItem>
-        ))}
-      </MenuList>
-      <Divider />
+            {restaurantName?.charAt(0)?.toUpperCase()}
+          </Avatar>
+        </ListItemIcon>
+        <ListItemText
+          primary={restaurantName ?? "Restaurant Name"}
+          secondary={restaurantEmail ?? "email@example.com"}
+          primaryTypographyProps={{ 
+            variant: "subtitle2",
+            fontWeight: 600 
+          }}
+          secondaryTypographyProps={{ 
+            variant: "caption",
+            color: "text.secondary"
+          }}
+        />
+      </MenuItem>
+      
+      {/* Footer Section */}
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>
@@ -262,7 +249,6 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
     <Account
       slots={{
         preview: PreviewComponent,
-        popoverContent: SidebarFooterAccountPopover,
       }}
       slotProps={{
         popover: {

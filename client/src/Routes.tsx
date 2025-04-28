@@ -62,7 +62,7 @@ const AppRoutes = () => {
       <Route path="/home" element={<UserHome />} />
       <Route path="/error" element={<ErrorPage />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/resturantAdmin" element={<ResturantAdmin />} />
+      <Route path="/restaurantAdmin" element={<ResturantAdmin />} />
       <Route path="/menumanager" element={<MenuManager />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/myOrders" element={<PaidOrders />} />
