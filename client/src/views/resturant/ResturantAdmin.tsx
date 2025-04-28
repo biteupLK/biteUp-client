@@ -38,7 +38,6 @@ import { useNavigate } from "react-router-dom";
 
 //Get user dtails
 
-
 function AppTitle() {
   return (
     <Box
@@ -93,7 +92,7 @@ const Theme = createTheme({
       main: "#f28644",
       contrastText: "#ffffff",
     },
-    mode: "light", 
+    mode: "light",
   },
   breakpoints: {
     values: {
@@ -123,7 +122,6 @@ function Loader() {
 
 function RestaurantPageContent({ pathname }: { pathname: string }) {
   const [loading, setLoading] = React.useState(true);
-  
 
   React.useEffect(() => {
     // Simulate loading delay
@@ -172,63 +170,6 @@ function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
         handleClick={handleClick}
         open={open}
       />
-    </Stack>
-  );
-}
-
-const userDetails = getUserDetails();
-const restaurantEmail = userDetails?.email;
-const restaurantName = userDetails?.name;
-
-function SidebarFooterAccountPopover({ accounts = [] }) {
-  const userDetails = getUserDetails();
-  const restaurantEmail = userDetails?.email;
-  const restaurantName = userDetails?.name;
-
-  return (
-    <Stack direction="column" sx={{ width: 250 }}>
-      {/* User Account Section */}
-      <MenuItem
-        component="div"
-        sx={{
-          justifyContent: "flex-start",
-          width: "100%",
-          columnGap: 2,
-          py: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
-        <ListItemIcon>
-          <Avatar
-            sx={{
-              width: 40,
-              height: 40,
-              fontSize: "1rem",
-              bgcolor: '#f28644',
-            }}
-          >
-            {restaurantName?.charAt(0)?.toUpperCase()}
-          </Avatar>
-        </ListItemIcon>
-        <ListItemText
-          primary={restaurantName ?? "Restaurant Name"}
-          secondary={restaurantEmail ?? "email@example.com"}
-          primaryTypographyProps={{ 
-            variant: "subtitle2",
-            fontWeight: 600 
-          }}
-          secondaryTypographyProps={{ 
-            variant: "caption",
-            color: "text.secondary"
-          }}
-        />
-      </MenuItem>
-      
-      {/* Footer Section */}
-      <AccountPopoverFooter>
-        <SignOutButton />
-      </AccountPopoverFooter>
     </Stack>
   );
 }
@@ -283,16 +224,18 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
-const resAdminSession = {
-  user: {
-    name: restaurantName,
-    email: restaurantEmail,
-    image: "",
-  },
-};
-
 export default function DashboardLayoutAccountSidebar() {
+  const userDetails = getUserDetails();
+  const restaurantEmail = userDetails?.email;
+  const restaurantName = userDetails?.name;
   const [pathname, setPathname] = React.useState("/dashboard");
+  const resAdminSession = {
+    user: {
+      name: restaurantName,
+      email: restaurantEmail,
+      image: "",
+    },
+  };
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -305,17 +248,16 @@ export default function DashboardLayoutAccountSidebar() {
 
   const [session, setSession] = React.useState<Session | null>(resAdminSession);
   const authentication = React.useMemo(() => {
-
     return {
       signIn: () => {
         setSession(resAdminSession);
       },
       signOut: () => {
         setSession(null);
-        navigate('/'); // React Router navigation
+        navigate("/"); // React Router navigation
       },
     };
-  }, [router]); 
+  }, [router]);
 
   return (
     <AppProvider

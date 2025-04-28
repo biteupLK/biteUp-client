@@ -29,12 +29,10 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import DescriptionIcon from "@mui/icons-material/Description";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ImageIcon from "@mui/icons-material/Image";
 import getUserDetails from "../../customHooks/extractPayload";
 import DropzoneComponent from "../../components/DropzoneComponenet";
 import { addMenuItems, MenuItem } from "../../api/menuItemApi";
-import { MoneyOffCsredSharp, MoneyOutlined } from "@mui/icons-material";
 import { FaMoneyBill } from "react-icons/fa6";
 
 // Define keyframe animations
@@ -410,7 +408,7 @@ export default function AddMenuItem() {
                             <DropzoneComponent
                               files={files}
                               setFiles={handleFileChange}
-                              dropzoneLabel="Upload Food Image"
+                              dropzoneLabel="Upload Food Image (Max Size 10MB)"
                             />
                           </div>
                         </Slide>

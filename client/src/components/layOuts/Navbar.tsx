@@ -67,7 +67,6 @@ const Navbar: React.FC = () => {
   const { isLogin, handleLogout } = useAuth();
   const [loading, setLoading] = useState(false);
 
-
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -147,6 +146,7 @@ const Navbar: React.FC = () => {
           </ListItemButton>
         </ListItem>
 
+        {getUserDetails()?.role === "ResAdmin" && (
         <ListItem disablePadding>
           <ListItemButton
             onClick={async () => {
@@ -195,6 +195,7 @@ const Navbar: React.FC = () => {
             <ListItemText primary="My Restaurant" />
           </ListItemButton>
         </ListItem>
+        )}
 
         <ListItem disablePadding>
           <ListItemButton onClick={handleLogout}>
@@ -467,76 +468,81 @@ const Navbar: React.FC = () => {
                     </MenuItem>
 
                     {/* Restaurant Item */}
-                    <MenuItem
-                      onClick={async () => {
-                        try {
-                          handleMenuClose(); // Close the menu immediately (optional timing)
+                    {getUserDetails()?.role === "ResAdmin" && (
+                      <MenuItem
+                        onClick={async () => {
+                          try {
+                            handleMenuClose();
 
-                          const userDetails = getUserDetails();
-                          const email = userDetails?.email;
+                            const userDetails = getUserDetails();
+                            const email = userDetails?.email;
 
-                          if (!email) {
-                            console.error("No user email found.");
+                            if (!email) {
+                              console.error("No user email found.");
+                              handleNavigation("/", "Login");
+                              return;
+                            }
+
+                            const restaurantExists =
+                              await checkRestaurantEmail(email);
+
+                            if (restaurantExists) {
+                              handleNavigation("/restaurantAdmin", "Dashboard");
+                            } else {
+                              handleNavigation(
+                                "/restaurantForm",
+                                "Setup Restaurant"
+                              );
+                            }
+                          } catch (error) {
+                            console.error(
+                              "Error checking restaurant for email:",
+                              error
+                            );
                             handleNavigation("/", "Login");
-                            return;
                           }
-
-                          const restaurantExists =
-                            await checkRestaurantEmail(email);
-
-                          if (restaurantExists) {
-                            handleNavigation("/restaurantAdmin", "Dashboard"); // typo fixed
-                          } else {
-                            handleNavigation(
-                              "/restaurantForm",
-                              "Setup Restaurant"
-                            ); // optional better label
-                          }
-                        } catch (error) {
-                          console.error(
-                            "Error checking restaurant for email:",
-                            error
-                          );
-                          handleNavigation("/", "Login");
-                        }
-                      }}
-                      sx={{
-                        borderRadius: "16px",
-                        mx: 1,
-                        my: 0.5,
-                        py: 1.5,
-                        px: 2,
-                        transition: "all 0.25s ease-out",
-                        "&:hover": {
-                          bgcolor: "action.hover",
-                          "& .menu-item-icon": {
-                            transform: "scale(1.1)",
-                            color: "primary.main",
-                          },
-                          "& .menu-item-arrow": {
-                            opacity: 1,
-                            transform: "translateX(0)",
-                          },
-                        },
-                      }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <FaStore fontSize="small" className="menu-item-icon" />
-                      </ListItemIcon>
-                      <Typography variant="body1">My Restaurant</Typography>
-                      <Box
-                        className="menu-item-arrow"
+                        }}
                         sx={{
-                          ml: "auto",
-                          opacity: 0,
-                          transform: "translateX(-4px)",
+                          borderRadius: "16px",
+                          mx: 1,
+                          my: 0.5,
+                          py: 1.5,
+                          px: 2,
                           transition: "all 0.25s ease-out",
-                          color: "text.secondary",
+                          "&:hover": {
+                            bgcolor: "action.hover",
+                            "& .menu-item-icon": {
+                              transform: "scale(1.1)",
+                              color: "primary.main",
+                            },
+                            "& .menu-item-arrow": {
+                              opacity: 1,
+                              transform: "translateX(0)",
+                            },
+                          },
                         }}
                       >
-                        <ChevronRight fontSize="small" />
-                      </Box>
-                    </MenuItem>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <FaStore
+                            fontSize="small"
+                            className="menu-item-icon"
+                          />
+                        </ListItemIcon>
+                        <Typography variant="body1">My Restaurant</Typography>
+                        <Box
+                          className="menu-item-arrow"
+                          sx={{
+                            ml: "auto",
+                            opacity: 0,
+                            transform: "translateX(-4px)",
+                            transition: "all 0.25s ease-out",
+                            color: "text.secondary",
+                          }}
+                        >
+                          <ChevronRight fontSize="small" />
+                        </Box>
+                      </MenuItem>
+                    )}
 
                     {/* Logout Item */}
                     <MenuItem
