@@ -147,7 +147,6 @@ export default function AddMenuItem() {
         <Box
           sx={{
             mb: 4,
-            animation: `${float} 6s ease-in-out infinite`,
           }}
         >
           <Typography

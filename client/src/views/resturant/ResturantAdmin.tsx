@@ -33,6 +33,13 @@ import Orders from "./Orders";
 import AddMenuItem from "./MenuManager";
 import { FoodBankSharp } from "@mui/icons-material";
 
+import getUserDetails from "../../customHooks/extractPayload";
+
+//Get user dtails
+const userDetails = getUserDetails();
+const restaurantEmail = userDetails?.email;
+const restaurantName = userDetails?.name;
+
 function AppTitle() {
   return (
     <Box
@@ -172,8 +179,8 @@ function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
 const accounts = [
   {
     id: 1,
-    name: "Bharat Kashyap",
-    email: "bharatkashyap@outlook.com",
+    name: restaurantName,
+    email: restaurantEmail,
     image: "https://avatars.githubusercontent.com/u/19550456",
     color: "#f28644", 
     projects: [
@@ -213,7 +220,6 @@ function SidebarFooterAccountPopover() {
                 src={account.image ?? ""}
                 alt={account.name ?? ""}
               >
-                {account.name[0]}
               </Avatar>
             </ListItemIcon>
             <ListItemText
@@ -292,8 +298,8 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
 
 const resAdminSession = {
   user: {
-    name: "Bharat Kashyap",
-    email: "bharatkashyap@outlook.com",
+    name: restaurantName,
+    email: restaurantEmail,
     image: "https://avatars.githubusercontent.com/u/19550456",
   },
 };
