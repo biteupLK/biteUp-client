@@ -34,6 +34,7 @@ import AddMenuItem from "./MenuManager";
 import { FoodBankSharp } from "@mui/icons-material";
 
 import getUserDetails from "../../customHooks/extractPayload";
+import { useNavigate } from "react-router-dom";
 
 //Get user dtails
 const userDetails = getUserDetails();
@@ -94,7 +95,7 @@ const Theme = createTheme({
       main: "#f28644",
       contrastText: "#ffffff",
     },
-    mode: "light", // Explicitly set to light mode
+    mode: "light", 
   },
   breakpoints: {
     values: {
@@ -181,7 +182,7 @@ const accounts = [
     id: 1,
     name: restaurantName,
     email: restaurantEmail,
-    image: "https://avatars.githubusercontent.com/u/19550456",
+    image: "",
     color: "#f28644", 
     projects: [
       {
@@ -300,7 +301,7 @@ const resAdminSession = {
   user: {
     name: restaurantName,
     email: restaurantEmail,
-    image: "https://avatars.githubusercontent.com/u/19550456",
+    image: "",
   },
 };
 
@@ -314,18 +315,21 @@ export default function DashboardLayoutAccountSidebar() {
       navigate: (path) => setPathname(String(path)),
     };
   }, [pathname]);
+  const navigate = useNavigate();
 
   const [session, setSession] = React.useState<Session | null>(resAdminSession);
   const authentication = React.useMemo(() => {
+
     return {
       signIn: () => {
         setSession(resAdminSession);
       },
       signOut: () => {
         setSession(null);
+        navigate('/'); // React Router navigation
       },
     };
-  }, []);
+  }, [router]); 
 
   return (
     <AppProvider

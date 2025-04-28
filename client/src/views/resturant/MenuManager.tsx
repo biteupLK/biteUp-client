@@ -34,6 +34,8 @@ import ImageIcon from "@mui/icons-material/Image";
 import getUserDetails from "../../customHooks/extractPayload";
 import DropzoneComponent from "../../components/DropzoneComponenet";
 import { addMenuItems, MenuItem } from "../../api/menuItemApi";
+import { MoneyOffCsredSharp, MoneyOutlined } from "@mui/icons-material";
+import { FaMoneyBill } from "react-icons/fa6";
 
 // Define keyframe animations
 const pulse = keyframes`
@@ -348,7 +350,7 @@ export default function AddMenuItem() {
                             gap: 0.5,
                           }}
                         >
-                          <AttachMoneyIcon fontSize="small" /> Price
+                          <FaMoneyBill fontSize="small" /> Price
                         </Typography>
                         <Slide direction="right" in={true} timeout={700}>
                           <div>
