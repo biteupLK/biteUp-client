@@ -28,16 +28,20 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
   const [selectedItem, setSelectedItem] = useState<Cart | null>(null);
   const userDetails = getUserDetails();
   const email = userDetails?.email || "";
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { mutate: addToCartMutation } = useMutation({
     mutationFn: addToCart,
-    onSuccess: () => {
+    onSuccess: (data) => {
       setSnackbarOpen(true);
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
     },
-    onError: () => {
+    onError: (error) => {
       setSnackbarFailOpen(true);
-      console.error("Failed to add item to cart.");
+      // Optional: Store the error message in state to display in the snackbar
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to add item to cart"
+      );
     },
   });
 
@@ -171,10 +175,7 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
         />
       </Snackbar>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-      >
+      <Snackbar open={snackbarOpen} autoHideDuration={3000}>
         <Alert
           onClose={() => setSnackbarOpen(false)}
           severity="success"
@@ -187,15 +188,11 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
 
       <Snackbar
         open={snackbarFailOpen}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarFailOpen(false)}
       >
-        <Alert
-          onClose={() => setSnackbarFailOpen(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          Fail to Add Food to Cart
+        <Alert severity="error" onClose={() => setSnackbarFailOpen(false)}>
+          {errorMessage || "Failed to add item to cart"}
         </Alert>
       </Snackbar>
     </>

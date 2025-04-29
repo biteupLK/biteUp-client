@@ -62,6 +62,7 @@ const sessionMembers = z.object({
   amount_subtotal: amountSchema,
   amount: amountSchema,
   payment_intent: objectSchema,
+  receipt_url: objectSchema,
   currencyObject: z.null(),
   metadata: metadataSchema,
   billing_details: customerDetailsSchema,

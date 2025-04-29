@@ -408,7 +408,7 @@ export default function AddMenuItem() {
                             <DropzoneComponent
                               files={files}
                               setFiles={handleFileChange}
-                              dropzoneLabel="Upload Food Image (Max Size 10MB)"
+                              dropzoneLabel="Upload Food Image (Max Size 1MB)"
                             />
                           </div>
                         </Slide>
@@ -597,7 +597,7 @@ export default function AddMenuItem() {
               </Grow>
 
               {/* Preview Card with animation */}
-              <Grow in={true} timeout={1200}>
+              <Grow in={true} timeout={1200} >
                 <Card
                   elevation={0}
                   sx={{

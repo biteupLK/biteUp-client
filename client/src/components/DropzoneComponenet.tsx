@@ -14,14 +14,34 @@ function DropzoneComponent({
   dropzoneLabel?: string;
 }) {
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      // Do something with the files
+    (acceptedFiles: File[], fileRejections: any) => {
+      // Handle rejected files
+      if (fileRejections.length > 0) {
+        fileRejections.forEach((rejection: any) => {
+          const error = rejection.errors[0];
+          if (error.code === 'file-too-large') {
+            alert(`File ${rejection.file.name} is too large. Max size is 1MB.`);
+          } else if (error.code === 'file-invalid-type') {
+            alert(`File ${rejection.file.name} is not an image. Only image files are allowed.`);
+          }
+        });
+        return;
+      }
+
+      // Only proceed with valid files
       setFiles([...files, ...acceptedFiles]);
     },
     [files, setFiles]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+    },
+    maxSize: 1 * 1024 * 1024, // 1MB in bytes
+    multiple: true
+  });
 
   return (
     <Stack direction={"column"} sx={{ width: "100%" }}>
@@ -110,8 +130,11 @@ function DropzoneComponent({
           {dropzoneLabel
             ? `${dropzoneLabel}`
             : isDragActive
-              ? "Drop the files here ..."
-              : "Drag 'n' drop some files here, or click to select files"}
+              ? "Drop the images here ..."
+              : "Drag 'n' drop some images here, or click to select images"}
+        </Typography>
+        <Typography variant="caption" sx={{ color: grey[500] }}>
+          (Only JPEG, JPG, PNG, GIF, WEBP up to 1MB)
         </Typography>
       </Box>
     </Stack>
