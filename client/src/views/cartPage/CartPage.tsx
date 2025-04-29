@@ -813,7 +813,7 @@ const CartPage: React.FC = () => {
           </Box>
         </SwipeableDrawer>
       )}
-      // Update the mobile bottom sheet in the CartPage component
+      
       {isMobile && cartItems.length > 0 && !openMobileSummary && (
         <Paper
           elevation={3}
