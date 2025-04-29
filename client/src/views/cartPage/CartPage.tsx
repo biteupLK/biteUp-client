@@ -41,12 +41,13 @@ import {
 } from "@mui/icons-material";
 import { loadStripe } from "@stripe/stripe-js";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchCartItems } from "../../api/cartApi";
+import { deleteCartItems, fetchCartItems } from "../../api/cartApi";
 import getUserDetails from "../../customHooks/extractPayload";
 import { createPayment } from "../../api/paymentApi";
 import { enqueueSnackbar } from "notistack";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/biteUpLogo.png";
+import queryClient from "../../state/queryClient";
 
 interface CartItem {
   id: string;
@@ -142,7 +143,7 @@ const CartItem: React.FC<CartItemProps> = ({
               alt={item.name}
             />
             <Chip
-              label={`x${item.quantity}`}
+              label={`x${item.id}`}
               size="small"
               sx={{
                 position: "absolute",
@@ -497,8 +498,20 @@ const CartPage: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const [openMobileSummary, setOpenMobileSummary] = useState<boolean>(false);
 
+  const { mutate: deleteCartItemMutation } = useMutation({
+    mutationFn: deleteCartItems,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      console.log(data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const removeItem = (itemId: string) => {
     console.log("Remove item:", itemId);
+    deleteCartItemMutation(itemId);
     enqueueSnackbar("Item removed from cart", { variant: "success" });
   };
 
@@ -623,7 +636,6 @@ const CartPage: React.FC = () => {
           </Stack>
         </Container>
       </Box>
-
       <Container maxWidth="xl" sx={{ mt: 3 }}>
         {isLoading ? (
           <Box sx={{ py: 4 }}>
@@ -755,7 +767,6 @@ const CartPage: React.FC = () => {
           </Box>
         )}
       </Container>
-
       {isMobile && (
         <SwipeableDrawer
           anchor="bottom"
@@ -802,55 +813,55 @@ const CartPage: React.FC = () => {
           </Box>
         </SwipeableDrawer>
       )}
-
-{isMobile && cartItems.length > 0 && !openMobileSummary && (
-  <Paper
-    elevation={3}
-    sx={{
-      position: "fixed",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      p: 2,
-      bgcolor: "white",
-      zIndex: 99,
-      borderTopLeftRadius: "16px",
-      borderTopRightRadius: "16px",
-    }}
-  >
-    <Stack spacing={1}>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Box>
-          <Typography variant="body2" color="text.secondary">
-            {totalItems} items
-          </Typography>
-          <Typography variant="h6" fontWeight="700" color="primary">
-            Rs {total.toFixed(2)}
-          </Typography>
-        </Box>
-
-        <Button
-          variant="contained"
-          onClick={toggleMobileSummary}
-          startIcon={<PaymentIcon />}
+      
+      {isMobile && cartItems.length > 0 && !openMobileSummary && (
+        <Paper
+          elevation={3}
           sx={{
-            borderRadius: "10px",
-            py: 1.2,
-            px: 3,
-            fontWeight: "bold",
-            textTransform: "none",
-            fontSize: "16px",
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            p: 2,
+            bgcolor: "white",
+            zIndex: 99,
+            borderTopLeftRadius: "16px",
+            borderTopRightRadius: "16px",
           }}
         >
-          View Items
-        </Button>
-      </Stack>
-      
-      {/* <Button
+          <Stack spacing={1}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  {totalItems} items
+                </Typography>
+                <Typography variant="h6" fontWeight="700" color="primary">
+                  Rs {total.toFixed(2)}
+                </Typography>
+              </Box>
+
+              <Button
+                variant="contained"
+                onClick={toggleMobileSummary}
+                startIcon={<PaymentIcon />}
+                sx={{
+                  borderRadius: "10px",
+                  py: 1.2,
+                  px: 3,
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  fontSize: "16px",
+                }}
+              >
+                View Items
+              </Button>
+            </Stack>
+
+            {/* <Button
         variant="outlined"
         fullWidth
         onClick={toggleMobileSummary}
@@ -866,9 +877,9 @@ const CartPage: React.FC = () => {
       >
         Pay Items Individually
       </Button> */}
-    </Stack>
-  </Paper>
-)}
+          </Stack>
+        </Paper>
+      )}
     </Box>
   );
 };
