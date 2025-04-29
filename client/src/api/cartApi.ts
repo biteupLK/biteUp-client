@@ -26,3 +26,8 @@ export async function fetchCartItems(email: String) {
   const res = await axios.get(`/api/cart/${email}`);
   return res.data;
 }
+
+export async function deleteCartItems(id: String) {
+  const res = await axios.delete(`/api/cart/${id}`);
+  return res.data;
+}
