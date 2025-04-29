@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchMyOrders, CheckoutEvent } from "../../api/myOrdersApi";
+import { CheckoutEvent, fetchRestaurantOrders } from "../../api/myOrdersApi";
 import getUserDetails from "../../customHooks/extractPayload";
 import {
   Box,
@@ -35,7 +35,7 @@ const PaidOrders = () => {
     isError,
   } = useQuery({
     queryKey: ["paidOrders", email],
-    queryFn: () => fetchMyOrders(email!),
+    queryFn: () => fetchRestaurantOrders(email!),
     enabled: !!email,
   });
 

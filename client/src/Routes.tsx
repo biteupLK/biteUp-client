@@ -14,6 +14,7 @@ import MenuManager from "./views/resturant/MenuManager";
 import RestaurantForm from "./views/resturant/RestaurantForm";
 import CartPage from "./views/cartPage/CartPage";
 import PaidOrders from "./views/myOrders/MyOrders";
+import DeliveryPerson from "./views/delivery/DeliveryPerson";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
@@ -50,9 +51,8 @@ const AdminProtectedRoute = () => {
 };
 
 const AppRoutes = () => {
-
   const isLogin = useAuth();
-  console.log(isLogin)
+  console.log(isLogin);
 
   return (
     <Routes>
@@ -62,14 +62,14 @@ const AppRoutes = () => {
       <Route path="/home" element={<UserHome />} />
       <Route path="/error" element={<ErrorPage />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/restaurantAdmin" element={<ResturantAdmin />} />
       <Route path="/menumanager" element={<MenuManager />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/myOrders" element={<PaidOrders />} />
-
+      <Route path="/delivery" element={<DeliveryPerson />} />
       <Route element={<UserRestaurantAdmin />}>
         <Route path="/restaurantForm" element={<RestaurantForm />} />
         <Route path="/menumanager" element={<MenuManager />} />
+        <Route path="/restaurantAdmin" element={<ResturantAdmin />} />
       </Route>
 
       <Route element={<UserBackwardProtectedRoute />}>
@@ -79,7 +79,6 @@ const AppRoutes = () => {
       <Route element={<AdminProtectedRoute />}>
         <Route path="/admin" element={<Error />} />
       </Route>
-
     </Routes>
   );
 };

@@ -102,6 +102,6 @@ export async function fetchMyOrders(email: string) {
 }
 
 export async function fetchRestaurantOrders(email: string) {
-  const res = await axios.get<CheckoutEvents>(`/api/payment/${email}/get-restaurant-order`);
+  const res = await axios.get<CheckoutEvents>(`/api/payment/${email}/get/restaurant-order`);
   return res.data;
 }

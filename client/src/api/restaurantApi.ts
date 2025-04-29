@@ -28,6 +28,11 @@ export async function fetchRestaurantData() {
     return res.data;
 }
 
+export async function fetchRestaurantByEmail(email: String) {
+    const res = await axios.get(`/api/restaurant/${email}`);
+    return res.data;
+}
+
 export async function addRestaurant(data: RestaurantSchema) {
     const res = await axios.post("/api/restaurant/create", data);
     return res.data;
