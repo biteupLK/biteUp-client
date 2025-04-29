@@ -18,6 +18,9 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { styled } from '@mui/material/styles';
+import Badge, { badgeClasses } from '@mui/material/Badge';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -27,7 +30,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
-import { FaCartShopping, FaStore, FaUserLarge } from "react-icons/fa6";
+import { FaStore, FaUserLarge } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
 import useAuth from "../../customHooks/keycloak";
 
@@ -39,6 +42,8 @@ import getUserDetails from "../../customHooks/extractPayload";
 
 import NavigationButtons from "../NavigationButtons"; // Import your NavigationButtons component
 import { ChevronRight } from "@mui/icons-material";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCartItems } from "../../api/cartApi";
 
 // Create a context to manage active page
 interface NavContextType {
@@ -64,6 +69,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate(); // Add this line
   const userDetails = getUserDetails();
   const name = userDetails?.name;
+  const email = userDetails?.email;
   const { isLogin, handleLogout } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -71,9 +77,25 @@ const Navbar: React.FC = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  //cart function
+  const { data: cartItems = [] } = useQuery({
+    queryKey: ["cartItems", email],
+    queryFn: () => fetchCartItems(email!),
+  });
+
+  const totalItems = cartItems.length;
+
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const CartBadge = styled(Badge)`
+  & .${badgeClasses.badge} {
+    top: -12px;
+    right: -6px;
+    background-color: #008000 !important;
+  }
+`;
 
   // Update active page based on current route
   React.useEffect(() => {
@@ -147,54 +169,54 @@ const Navbar: React.FC = () => {
         </ListItem>
 
         {getUserDetails()?.role === "ResAdmin" && (
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={async () => {
-              if (loading) return; // prevent double click
-              setLoading(true);
-              try {
-                const userDetails = getUserDetails();
-                const email = userDetails?.email;
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={async () => {
+                if (loading) return; // prevent double click
+                setLoading(true);
+                try {
+                  const userDetails = getUserDetails();
+                  const email = userDetails?.email;
 
-                if (!email) {
-                  console.error("No user email found.");
-                  handleNavigation("/", "Login");
-                  return;
-                }
+                  if (!email) {
+                    console.error("No user email found.");
+                    handleNavigation("/", "Login");
+                    return;
+                  }
 
-                const restaurantExists = await checkRestaurantEmail(email);
-                if (restaurantExists) {
-                  handleNavigation("/restaurantAdmin", "Dashboard");
-                } else {
-                  handleNavigation("/restaurantForm", "Login");
+                  const restaurantExists = await checkRestaurantEmail(email);
+                  if (restaurantExists) {
+                    handleNavigation("/restaurantAdmin", "Dashboard");
+                  } else {
+                    handleNavigation("/restaurantForm", "Login");
+                  }
+                } catch (error) {
+                  console.error("Error checking restaurant:", error);
+                  handleNavigation("/loginform", "Login");
+                } finally {
+                  setLoading(false);
                 }
-              } catch (error) {
-                console.error("Error checking restaurant:", error);
-                handleNavigation("/loginform", "Login");
-              } finally {
-                setLoading(false);
-              }
-            }}
-            selected={activePage === "My Restaurant"}
-            sx={{
-              transition: "all 0.3s ease",
-              "&.Mui-selected": {
-                backgroundColor: "rgba(0,0,0,0.1)",
-              },
-              "&.Mui-selected:hover": {
-                backgroundColor: "rgba(0,0,0,0.15)",
-              },
-              "&:hover": {
-                backgroundColor: "rgba(0,0,0,0.05)",
-              },
-            }}
-          >
-            <ListItemIcon>
-              <FaStore />
-            </ListItemIcon>
-            <ListItemText primary="My Restaurant" />
-          </ListItemButton>
-        </ListItem>
+              }}
+              selected={activePage === "My Restaurant"}
+              sx={{
+                transition: "all 0.3s ease",
+                "&.Mui-selected": {
+                  backgroundColor: "rgba(0,0,0,0.1)",
+                },
+                "&.Mui-selected:hover": {
+                  backgroundColor: "rgba(0,0,0,0.15)",
+                },
+                "&:hover": {
+                  backgroundColor: "rgba(0,0,0,0.05)",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <FaStore />
+              </ListItemIcon>
+              <ListItemText primary="My Restaurant" />
+            </ListItemButton>
+          </ListItem>
         )}
 
         <ListItem disablePadding>
@@ -290,13 +312,13 @@ const Navbar: React.FC = () => {
               {/* Shopping Cart */}
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Link to="/cart">
-                  <IconButton
-                    sx={{
-                      display: { xs: "inline-flex", md: "inline-flex" },
-                      p: 1,
-                    }}
-                  >
-                    <FaCartShopping style={{ fontSize: 25 }} />
+                  <IconButton>
+                    <ShoppingCartIcon fontSize="medium" />
+                    <CartBadge
+                      badgeContent={totalItems}
+                      color="primary"
+                      overlap="circular"
+                    />
                   </IconButton>
                 </Link>
               </motion.div>
