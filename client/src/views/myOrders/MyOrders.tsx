@@ -178,7 +178,7 @@ const PaidOrders = () => {
                         />
                         <Typography variant="body2">
                           {addr?.line1?.value}
-                          {addr?.line2?.value && , ${addr?.line2?.value}}
+                          {addr?.line2?.value && `, ${addr?.line2?.value}`}
                           <br />
                           {addr?.city?.value}
                         </Typography>
