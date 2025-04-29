@@ -58,11 +58,11 @@ const sessionMembers = z.object({
   success_url: objectSchema,
   mode: objectSchema,
   amount_subtotal: amountSchema,
-  amount_total: amountSchema,
+  amount: amountSchema,
   payment_intent: objectSchema,
   currencyObject: z.null(),
   metadata: metadataSchema,
-  customer_details: customerDetailsSchema,
+  billing_details: customerDetailsSchema,
   total_details: z.object({
     amount_discount: z.null(),
     amount_shipping: z.null(),
