@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchMyOrders, CheckoutEvent } from "../../api/myOrdersApi";
+import { CheckoutEvent, fetchRestaurantOrders } from "../../api/myOrdersApi";
 import getUserDetails from "../../customHooks/extractPayload";
 import {
   Box,
@@ -35,7 +35,7 @@ const PaidOrders = () => {
     isError,
   } = useQuery({
     queryKey: ["paidOrders", email],
-    queryFn: () => fetchMyOrders(email!),
+    queryFn: () => fetchRestaurantOrders(email!),
     enabled: !!email,
   });
 
@@ -97,17 +97,17 @@ const PaidOrders = () => {
       <Stack spacing={3}>
         {orders.map((order: CheckoutEvent) => {
           // The members object directly holds all your fields:
-          const m = order.data.object.members;
+          const m = order?.data?.object?.members;
 
-          // metadata and customer_details are under `m`
-          const metadata = m.metadata.members;
-          const customer = m.customer_details.members;
-          const addr = customer.address.members;
+          // metadata and customer_details are under m
+          const metadata = m?.metadata?.members;
+          const customer = m?.billing_details?.members;
+          const addr = customer?.address?.members;
 
-          // amounts are nested one level deeper in `.value`
-          const total = m.amount_total.value.value;
+          // amounts are nested one level deeper in .value
+          const total = m?.amount?.value?.value;
 
-          const pId = m.payment_intent.value;
+          const pId = m?.payment_intent?.value;
 
           return (
             <Card
@@ -141,28 +141,28 @@ const PaidOrders = () => {
                 >
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      {metadata.foodName.value}
+                      {metadata?.foodName?.value}
                     </Typography>
 
                     <Stack spacing={1.5} sx={{ mt: 2 }}>
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Person fontSize="small" color="action" />
                         <Typography variant="body2">
-                          {customer.name.value}
+                          {customer?.name?.value}
                         </Typography>
                       </Stack>
 
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Email fontSize="small" color="action" />
                         <Typography variant="body2">
-                          {customer.email.value}
+                          {customer?.email?.value}
                         </Typography>
                       </Stack>
 
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Phone fontSize="small" color="action" />
                         <Typography variant="body2">
-                          {metadata.phone.value}
+                          {metadata?.phone?.value}
                         </Typography>
                       </Stack>
 
@@ -177,10 +177,10 @@ const PaidOrders = () => {
                           sx={{ mt: 0.5 }}
                         />
                         <Typography variant="body2">
-                          {addr.line1.value}
-                          {addr.line2.value && `, ${addr.line2.value}`}
+                          {addr?.line1?.value}
+                          {addr?.line2?.value && `, ${addr?.line2?.value}`}
                           <br />
-                          {addr.city.value}
+                          {addr?.city?.value}
                         </Typography>
                       </Stack>
                     </Stack>

@@ -58,11 +58,11 @@ const sessionMembers = z.object({
   success_url: objectSchema,
   mode: objectSchema,
   amount_subtotal: amountSchema,
-  amount_total: amountSchema,
+  amount: amountSchema,
   payment_intent: objectSchema,
   currencyObject: z.null(),
   metadata: metadataSchema,
-  customer_details: customerDetailsSchema,
+  billing_details: customerDetailsSchema,
   total_details: z.object({
     amount_discount: z.null(),
     amount_shipping: z.null(),
@@ -100,6 +100,6 @@ export async function fetchMyOrders(email: string) {
 }
 
 export async function fetchRestaurantOrders(email: string) {
-  const res = await axios.get<CheckoutEvents>(`/api/payment/${email}/get-restaurant-order`);
+  const res = await axios.get<CheckoutEvents>(`/api/payment/${email}/get/restaurant-order`);
   return res.data;
 }

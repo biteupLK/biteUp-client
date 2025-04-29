@@ -487,7 +487,7 @@ const Navbar: React.FC = () => {
                               await checkRestaurantEmail(email);
 
                             if (restaurantExists) {
-                              handleNavigation("/restaurantAdmin", "Dashboard");
+                              handleNavigation("/RestaurantAdmin", "Dashboard");
                             } else {
                               handleNavigation(
                                 "/restaurantForm",
