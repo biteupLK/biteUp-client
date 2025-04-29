@@ -40,6 +40,7 @@ const metadataMembers = z.object({
   receipt_email: z.object({ value: z.string() }),
   restaurantEmail: z.object({ value: z.string() }),
   phone: z.object({ value: z.string() }),
+  signedUrl: z.object({value: z.string()})
 });
 const metadataSchema = z.object({ members: metadataMembers });
 export type Metadata = z.infer<typeof metadataSchema>;
@@ -58,11 +59,12 @@ const sessionMembers = z.object({
   success_url: objectSchema,
   mode: objectSchema,
   amount_subtotal: amountSchema,
-  amount_total: amountSchema,
+  amount: amountSchema,
   payment_intent: objectSchema,
+  receipt_url: objectSchema,
   currencyObject: z.null(),
   metadata: metadataSchema,
-  customer_details: customerDetailsSchema,
+  billing_details: customerDetailsSchema,
   total_details: z.object({
     amount_discount: z.null(),
     amount_shipping: z.null(),
