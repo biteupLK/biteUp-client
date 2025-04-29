@@ -22,6 +22,10 @@ import {
   Fade,
   Slide,
   Zoom,
+  MenuItem as MuiMenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -30,6 +34,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ImageIcon from "@mui/icons-material/Image";
+import CategoryIcon from "@mui/icons-material/Category";
 import getUserDetails from "../../customHooks/extractPayload";
 import DropzoneComponent from "../../components/DropzoneComponenet";
 import { addMenuItems, MenuItem } from "../../api/menuItemApi";
@@ -47,6 +52,14 @@ const float = keyframes`
   50% { transform: translateY(-5px); }
   100% { transform: translateY(0px); }
 `;
+
+// Define food categories
+const foodCategories = [
+  { value: "Burgers", label: "Burgers" },
+  { value: "Pizza", label: "Pizza" },
+  { value: "Beverages", label: "Beverages" },
+  { value: "Vegetarian", label: "Vegetarian" },
+];
 
 export default function AddMenuItem() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -71,6 +84,9 @@ export default function AddMenuItem() {
     watch,
   } = useForm<MenuItem>({
     mode: "onChange",
+    defaultValues: {
+      category: "Burgers", // Set default category
+    },
   });
 
   const watchedFields = watch();
@@ -95,7 +111,9 @@ export default function AddMenuItem() {
   });
 
   const resetForm = () => {
-    reset();
+    reset({
+      category: "Burgers", // Reset to default category
+    });
     setFiles([]);
     setImagePreview(null);
   };
@@ -131,6 +149,7 @@ export default function AddMenuItem() {
     watchedFields.name &&
     watchedFields.description &&
     watchedFields.price &&
+    watchedFields.category &&
     files.length > 0;
 
   return (
@@ -328,6 +347,55 @@ export default function AddMenuItem() {
                                   },
                                 }}
                               />
+                            )}
+                          />
+                        </div>
+                      </Slide>
+                    </Box>
+
+                    {/* Category */}
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mb: 1,
+                          color: mainColor,
+                          fontWeight: 500,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                        }}
+                      >
+                        <CategoryIcon fontSize="small" /> Category
+                      </Typography>
+                      <Slide direction="right" in={true} timeout={650}>
+                        <div>
+                          <Controller
+                            name="category"
+                            control={control}
+                            defaultValue="Burgers"
+                            rules={{ required: "Category is required" }}
+                            render={({ field }) => (
+                              <FormControl fullWidth>
+                                <Select
+                                  {...field}
+                                  variant="outlined"
+                                  error={!!errors.category}
+                                  sx={{
+                                    borderRadius: 2,
+                                    backgroundColor: alpha("#f8f9fa", 0.5),
+                                  }}
+                                >
+                                  {foodCategories.map((category) => (
+                                    <MuiMenuItem
+                                      key={category.value}
+                                      value={category.value}
+                                    >
+                                      {category.label}
+                                    </MuiMenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
                             )}
                           />
                         </div>
@@ -542,9 +610,9 @@ export default function AddMenuItem() {
                           "Research local market prices to ensure your offerings remain competitive yet profitable.",
                       },
                       {
-                        title: "Categorize items",
+                        title: "Proper categorization",
                         description:
-                          "Group similar items together (Appetizers, Mains, Desserts, etc.) for better organization.",
+                          "Assign each item to the correct category (Burgers, Pizza, Beverages, Vegetarian) for better organization.",
                       },
                     ].map((item, index) => (
                       <Fade key={index} in={true} timeout={(index + 1) * 300}>
@@ -597,7 +665,7 @@ export default function AddMenuItem() {
               </Grow>
 
               {/* Preview Card with animation */}
-              <Grow in={true} timeout={1200} >
+              <Grow in={true} timeout={1200}>
                 <Card
                   elevation={0}
                   sx={{
@@ -634,6 +702,7 @@ export default function AddMenuItem() {
                     {watchedFields.name ||
                     watchedFields.description ||
                     watchedFields.price ||
+                    watchedFields.category ||
                     imagePreview ? (
                       <Box>
                         <Box
@@ -677,6 +746,15 @@ export default function AddMenuItem() {
                           <Typography variant="h6" gutterBottom>
                             {watchedFields.name || "Food Name"}
                           </Typography>
+                          <Chip
+                            label={watchedFields.category || "Category"}
+                            size="small"
+                            sx={{
+                              mb: 1,
+                              backgroundColor: alpha(mainColor, 0.1),
+                              color: mainColor,
+                            }}
+                          />
                           <Typography
                             variant="body2"
                             color="text.secondary"

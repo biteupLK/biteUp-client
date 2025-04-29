@@ -6,6 +6,7 @@ const menuItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
+  category: z.string(),
   price: z.number(),
   signedUrl:z.string(),
   restaurentId: z.string(),
@@ -23,6 +24,7 @@ export const addMenuItems = async (menuItem: MenuItem) => {
     name: menuItem.name,
     description: menuItem.description,
     price: Number(menuItem.price),
+    category: menuItem.category,
     restaurantEmail: menuItem.restaurantEmail || "",
   };
   formData.append("product", JSON.stringify(productData));

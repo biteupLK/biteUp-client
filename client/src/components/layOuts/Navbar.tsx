@@ -18,9 +18,9 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import Badge, { badgeClasses } from '@mui/material/Badge';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
+import { styled } from "@mui/material/styles";
+import Badge, { badgeClasses } from "@mui/material/Badge";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -90,12 +90,12 @@ const Navbar: React.FC = () => {
   };
 
   const CartBadge = styled(Badge)`
-  & .${badgeClasses.badge} {
-    top: -12px;
-    right: -6px;
-    background-color: #008000 !important;
-  }
-`;
+    & .${badgeClasses.badge} {
+      top: -12px;
+      right: -6px;
+      background-color: #008000 !important;
+    }
+  `;
 
   // Update active page based on current route
   React.useEffect(() => {
@@ -259,19 +259,23 @@ const Navbar: React.FC = () => {
             />
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Navigation Buttons */}
-            <NavigationButtons
-              activePage={activePage}
-              setActivePage={setActivePage}
-              isMobile={isMobile}
-              handleNavigation={handleNavigation}
-            />
-          </motion.div>
+          <Box sx={{
+            ml:20
+          }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Navigation Buttons */}
+              <NavigationButtons
+                activePage={activePage}
+                setActivePage={setActivePage}
+                isMobile={isMobile}
+                handleNavigation={handleNavigation}
+              />
+            </motion.div>
+          </Box>
 
           {/* Mobile Menu Toggle and Desktop Controls */}
           <Box
