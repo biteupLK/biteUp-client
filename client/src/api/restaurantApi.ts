@@ -71,14 +71,14 @@ export async function checkRestaurantEmail(email: string) {
 }
 
 export async function getRestaurantImg(email: string) {
-  const res = await axios.get(`/api/restaurant/getSignedUrl/${email}`); // Added slash before email
-  return res.data.signedUrl; // Return just the signedUrl from the response
+  const res = await axios.get(`/api/restaurant/getSignedUrl/${email}`); 
+  return res.data.signedUrl; 
 }
 
 export async function updateRestaurant(
   email: string,
   data: RestaurantSchema,
-  image?: File // ✅ Explicitly mark as `File` type
+  image?: File 
 ) {
   const formData = new FormData();
 
@@ -100,7 +100,6 @@ export async function updateRestaurant(
   
   formData.append("restaurant", JSON.stringify(restaurantData));
 
-  // ✅ Safe file handling
   if (image instanceof File) {
     formData.append("image", image);
   }
@@ -111,4 +110,19 @@ export async function updateRestaurant(
     },
   });
   return res.data;
+}
+
+export async function deleteRestaurant(email: string) {
+  try {
+    const res = await axios.delete(`/api/restaurant/${email}`);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 404) {
+        throw new Error("Restaurant not found.");
+      }
+      throw new Error(error.response?.data || "Failed to delete restaurant.");
+    }
+    throw new Error("An unexpected error occurred.");
+  }
 }
