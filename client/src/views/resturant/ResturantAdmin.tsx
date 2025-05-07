@@ -255,8 +255,6 @@ function ToolbarAccount() {
   const userDetails = getUserDetails();
   const restaurantEmail = userDetails?.email;
   const [imageUrl, setImageUrl] = React.useState<string | null>(null);
-  const navigate = useNavigate();
-  const [openEditModal, setOpenEditModal] = React.useState(false);
 
   React.useEffect(() => {
     async function fetchImage() {
@@ -271,11 +269,6 @@ function ToolbarAccount() {
     }
     fetchImage();
   }, [restaurantEmail]);
-
-  const handleOpenUpdateProfile = () => {
-    navigate("/restaurantProfileUpdate")
-    
-  };
 
   return (
     <>
