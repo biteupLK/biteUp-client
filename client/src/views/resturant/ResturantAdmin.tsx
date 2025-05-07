@@ -8,9 +8,17 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
 import { createTheme } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import EditIcon from "@mui/icons-material/Edit";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import { AppProvider } from "@toolpad/core/AppProvider";
 import {
   DashboardLayout,
@@ -19,8 +27,6 @@ import {
 import {
   Account,
   AccountPreview,
-  AccountPopoverFooter,
-  SignOutButton,
   AccountPreviewProps,
 } from "@toolpad/core/Account";
 import type { Navigation, Router, Session } from "@toolpad/core/AppProvider";
@@ -34,9 +40,8 @@ import AddMenuItem from "./MenuManager";
 import { FoodBankSharp } from "@mui/icons-material";
 
 import getUserDetails from "../../customHooks/extractPayload";
-import { useNavigate } from "react-router-dom";
-
-//Get user dtails
+import { Link, useNavigate } from "react-router-dom";
+import { getRestaurantImg } from "../../api/restaurantApi";
 
 function AppTitle() {
   return (
@@ -57,7 +62,7 @@ function AppTitle() {
         }}
       />
 
-      <Typography variant="h6" noWrap>
+      <Typography variant="h6" noWrap sx={{ fontWeight: 600 }}>
         Restaurants
       </Typography>
     </Box>
@@ -124,7 +129,6 @@ function RestaurantPageContent({ pathname }: { pathname: string }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // Simulate loading delay
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -135,7 +139,6 @@ function RestaurantPageContent({ pathname }: { pathname: string }) {
     return <Loader />;
   }
 
-  // Render different components based on the pathname
   switch (pathname) {
     case "/dashboard":
       return <Dashboard />;
@@ -162,6 +165,25 @@ function RestaurantPageContent({ pathname }: { pathname: string }) {
 
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   const { handleClick, open, mini } = props;
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+  const userDetails = getUserDetails();
+  const restaurantEmail = userDetails?.email;
+
+  React.useEffect(() => {
+    async function fetchImage() {
+      try {
+        if (restaurantEmail) {
+          const url = await getRestaurantImg(restaurantEmail);
+          setImageUrl(url);
+        }
+      } catch (error) {
+        console.error("Failed to fetch restaurant image:", error);
+        setImageUrl(null);
+      }
+    }
+    fetchImage();
+  }, [restaurantEmail]);
+
   return (
     <Stack direction="column" p={0}>
       <Divider />
@@ -169,6 +191,11 @@ function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
         variant={mini ? "condensed" : "expanded"}
         handleClick={handleClick}
         open={open}
+        slots={{
+          avatar: imageUrl
+            ? () => <Avatar src={imageUrl} alt="Restaurant" />
+            : () => <Avatar>{restaurantEmail?.charAt(0).toUpperCase()}</Avatar>,
+        }}
       />
     </Stack>
   );
@@ -224,18 +251,152 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
+function ToolbarAccount() {
+  const userDetails = getUserDetails();
+  const restaurantEmail = userDetails?.email;
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+  const navigate = useNavigate();
+  const [openEditModal, setOpenEditModal] = React.useState(false);
+
+  React.useEffect(() => {
+    async function fetchImage() {
+      try {
+        if (restaurantEmail) {
+          const url = await getRestaurantImg(restaurantEmail);
+          setImageUrl(url);
+        }
+      } catch (error) {
+        console.error("Failed to fetch restaurant image:", error);
+      }
+    }
+    fetchImage();
+  }, [restaurantEmail]);
+
+  const handleOpenUpdateProfile = () => {
+    navigate("/restaurantProfileUpdate")
+    
+  };
+
+  return (
+    <>
+      <Account
+        slots={{
+          preview: (props) => (
+            <AccountPreview
+              {...props}
+              variant="condensed"
+              slots={{
+                avatar: () => (
+                  <Avatar 
+                    src={imageUrl || undefined} 
+                    alt={restaurantEmail}
+                    sx={{ 
+                      width: 40, 
+                      height: 40,
+                      border: '2px solid #f28644',
+                      '&:hover': {
+                        transform: 'scale(1.1)',
+                        transition: 'transform 0.2s ease-in-out'
+                      }
+                    }}
+                  >
+                    {restaurantEmail?.charAt(0).toUpperCase()}
+                  </Avatar>
+                ),
+              }}
+            />
+          ),
+          popoverContent: ({ }) => (
+            <Box sx={{ p: 2, width: 240 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Avatar 
+                  src={imageUrl || undefined}
+                  sx={{ width: 48, height: 48, mr: 2 }}
+                >
+                  {restaurantEmail?.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="medium">
+                    {userDetails?.name || 'Profile'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {restaurantEmail}
+                  </Typography>
+                </Box>
+              </Box>
+              <Link to="/restaurantProfileUpdate" style={{ textDecoration: 'none' }}>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<EditIcon />}
+                // onClick={() => {
+                //   handleOpenUpdateProfile();
+                // }}
+                sx={{
+                  mt: 1,
+                  py: 1.5,
+                  borderRadius: 2,
+                  bgcolor: '#f28644',
+                  '&:hover': {
+                    bgcolor: '#e07a3d',
+                    boxShadow: '0 4px 12px rgba(242, 134, 68, 0.3)'
+                  }
+                }}
+              >
+                Edit Profile
+              </Button>
+              </Link>
+            </Box>
+          ),
+        }}
+        slotProps={{
+          popover: {
+            transformOrigin: { horizontal: "right", vertical: "top" },
+            anchorOrigin: { horizontal: "right", vertical: "bottom" },
+            slotProps: {
+              paper: {
+                sx: {
+                  mt: 1.5,
+                  borderRadius: 2,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  overflow: 'hidden',
+                },
+              },
+            },
+          },
+        }}
+      />
+    </>
+  );
+}
+
 export default function DashboardLayoutAccountSidebar() {
   const userDetails = getUserDetails();
   const restaurantEmail = userDetails?.email;
   const restaurantName = userDetails?.name;
   const [pathname, setPathname] = React.useState("/dashboard");
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
   const resAdminSession = {
     user: {
       name: restaurantName,
       email: restaurantEmail,
-      image: "",
+      image: imageUrl || "",
     },
   };
+
+  React.useEffect(() => {
+    async function fetchImage() {
+      try {
+        if (restaurantEmail) {
+          const url = await getRestaurantImg(restaurantEmail);
+          setImageUrl(url);
+        }
+      } catch (error) {
+        console.error("Failed to fetch restaurant image:", error);
+      }
+    }
+    fetchImage();
+  }, [restaurantEmail]);
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -245,7 +406,6 @@ export default function DashboardLayoutAccountSidebar() {
     };
   }, [pathname]);
   const navigate = useNavigate();
-
   const [session, setSession] = React.useState<Session | null>(resAdminSession);
   const authentication = React.useMemo(() => {
     return {
@@ -254,10 +414,10 @@ export default function DashboardLayoutAccountSidebar() {
       },
       signOut: () => {
         setSession(null);
-        navigate("/"); // React Router navigation
+        navigate("/");
       },
     };
-  }, [router]);
+  }, [navigate]);
 
   return (
     <AppProvider
@@ -269,7 +429,7 @@ export default function DashboardLayoutAccountSidebar() {
     >
       <DashboardLayout
         slots={{
-          toolbarAccount: () => null,
+          toolbarAccount: ToolbarAccount,
           sidebarFooter: SidebarFooterAccount,
           appTitle: AppTitle,
         }}

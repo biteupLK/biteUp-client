@@ -12,10 +12,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "^5.0.1",
     "@mui/icons-material": "^7.0.2",
     "@mui/joy": "^5.0.0-beta.52",
     "@mui/lab": "^7.0.0-beta.11",
     "@mui/material": "^7.0.2",
+    "@react-google-maps/api": "^2.20.6",
     "@stomp/stompjs": "^7.1.1",
     "@stripe/react-stripe-js": "^3.6.0",
     "@stripe/stripe-js": "^7.0.0",
@@ -38,7 +40,7 @@
     "react-stomp-hooks": "^3.0.1",
     "socket.io-client": "^4.8.1",
     "sockjs-client": "^1.6.1",
-    "zod": "^3.24.2"
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
