@@ -38,6 +38,7 @@ import getUserDetails from "../../customHooks/extractPayload";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/biteUpLogo.png";
 import { motion } from "framer-motion";
+import DropzoneComponent from "../../components/DropzoneComponenet";
 
 // Custom styled component for file upload
 const VisuallyHiddenInput = styled("input")({
@@ -138,7 +139,6 @@ const RestaurantStepperForm = () => {
       phoneNumber: "",
       email: email,
       description: "",
-      logo: null,
       latitude: null,
       longitude: null,
       placeId: null,
@@ -149,7 +149,7 @@ const RestaurantStepperForm = () => {
   // Watch for values to validate steps
   const watchName = watch("name");
   const watchDescription = watch("description");
-  const watchLogo = watch("logo");
+  const watchLogo = watch("image");
   const watchLatitude = watch("latitude");
   const watchLongitude = watch("longitude");
   const watchAddress = watch("address");
@@ -157,6 +157,7 @@ const RestaurantStepperForm = () => {
   const watchState = watch("state");
   const watchZipCode = watch("zipCode");
   const watchPhoneNumber = watch("phoneNumber");
+  const [files, setFiles] = useState<File[]>([]);
 
   // TanStack mutation for handling form submission
   const mutation = useMutation({
@@ -177,7 +178,7 @@ const RestaurantStepperForm = () => {
 
       // Redirect to dashboard after 2 seconds (give time to see success message)
       setTimeout(() => {
-        navigate("/resturantAdmin"); // or whatever your dashboard route is
+        navigate("/RestaurantAdmin"); 
       }, 2000);
     },
 
@@ -327,6 +328,10 @@ const RestaurantStepperForm = () => {
   // Handle back step
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleFileChange = (newFiles: File[]) => {
+    setFiles(newFiles);
   };
 
   // Handle place selection
@@ -495,7 +500,11 @@ const RestaurantStepperForm = () => {
   };
 
   const onSubmit = (data: RestaurantSchema) => {
-    mutation.mutate(data);
+    const submitData: RestaurantSchema = {
+      ...data,
+      image: files,
+    };
+    mutation.mutate(submitData);
   };
 
   const handleLogoChange = (
@@ -589,8 +598,14 @@ const RestaurantStepperForm = () => {
                 </Box>
               )}
 
+              <DropzoneComponent
+                files={files}
+                setFiles={handleFileChange}
+                dropzoneLabel="Upload Food Image (Max Size 1MB)"
+              />
+
               <Controller
-                name="logo"
+                name="image"
                 control={control}
                 rules={{ required: "Restaurant logo is required" }}
                 render={({ field: { onChange, value, ...field } }) => (
@@ -604,17 +619,23 @@ const RestaurantStepperForm = () => {
                       <VisuallyHiddenInput
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleLogoChange(e, onChange)}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            onChange(file); // updates react-hook-form
+                            handleFileChange([file]); // updates any additional state
+                          }
+                        }}
                         {...field}
                       />
                     </Button>
-                    {errors.logo && (
+                    {errors.image && (
                       <Typography
                         color="error"
                         variant="caption"
                         sx={{ display: "block", mt: 1 }}
                       >
-                        {errors.logo.message}
+                        {errors.image.message}
                       </Typography>
                     )}
                   </Box>

@@ -15,6 +15,7 @@ import RestaurantForm from "./views/resturant/RestaurantForm";
 import CartPage from "./views/cartPage/CartPage";
 import PaidOrders from "./views/myOrders/MyOrders";
 import DeliveryPerson from "./views/delivery/DeliveryPerson";
+import RestaurantProfileUpdate from "./views/resturant/RestaurantProfileUpdate";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
@@ -66,10 +67,12 @@ const AppRoutes = () => {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/myOrders" element={<PaidOrders />} />
       <Route path="/delivery" element={<DeliveryPerson />} />
+      
       <Route element={<UserRestaurantAdmin />}>
         <Route path="/restaurantForm" element={<RestaurantForm />} />
         <Route path="/menumanager" element={<MenuManager />} />
         <Route path="/restaurantAdmin" element={<ResturantAdmin />} />
+        <Route path="/restaurantProfileUpdate" element={<RestaurantProfileUpdate />} />
       </Route>
 
       <Route element={<UserBackwardProtectedRoute />}>
