@@ -5,7 +5,7 @@ import { StorageFileSchema } from "../utils/StorageFiles.utils";
 export const RestaurantSchema = z.object({
   id: z.string(),
   restaurantName: z.string(),
-  adress: z.string(), // typo? should this be "address"?
+  adress: z.string(), 
   quantity: z.string(),
   name: z.string(),
   address: z.string(),
