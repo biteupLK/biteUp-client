@@ -27,11 +27,23 @@ import {
 import Navbar from "../../components/layOuts/Navbar";
 import { motion } from "framer-motion";
 import Footer from "../../components/layOuts/Footer";
+import { useState } from "react";
+import OpenMyOrdersDialog from "./WatchMyOrdersDialog";
 
 const PaidOrders = () => {
   const theme = useTheme();
   const userDetails = getUserDetails();
   const email = userDetails?.email;
+  const [selectedDeliver, setSelectedDeliver] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleOpenDialog = (deliver: any) => {
+    setSelectedDeliver(deliver);
+    setDialogOpen(true);
+  };
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
 
   const {
     data: orders,
@@ -125,6 +137,7 @@ const PaidOrders = () => {
           {orders.map((order: CheckoutEvent) => {
             // The members object directly holds all your fields:
             const m = order?.data?.object?.members;
+            const id = order?.id;
 
             // metadata and customer_details are under m
             const metadata = m?.metadata?.members;
@@ -197,7 +210,6 @@ const PaidOrders = () => {
                           <Typography variant="body2">
                             {customer?.email?.value}
                           </Typography>
-                          
                         </Stack>
 
                         <Stack direction="row" spacing={1} alignItems="center">
@@ -246,7 +258,7 @@ const PaidOrders = () => {
                           fontWeight="bold"
                           color="primary"
                         >
-                          Rs. {total}
+                          Rs. {(Number(total) / 100).toFixed(2)}
                         </Typography>
                         <Divider sx={{ my: 1 }} />
                         <Stack
@@ -265,9 +277,22 @@ const PaidOrders = () => {
                           >
                             View Receipt
                           </Button>
-                          <Typography variant="body2">
-                            {pId}
-                          </Typography>
+                          <Typography variant="body2">{pId}</Typography>
+
+                          <Typography variant="body2">{id}</Typography>
+                          <Button
+                            onClick={() => handleOpenDialog(id)} // or navigation logic
+                            startIcon={<Launch fontSize="small" />}
+                            size="small"
+                          >
+                            Go to Tracking
+                          </Button>
+
+                          <OpenMyOrdersDialog
+                            open={dialogOpen}
+                            onClose={handleCloseDialog}
+                            orderId={selectedDeliver || ""}
+                          />
                         </Stack>
                       </Paper>
                     </Box>

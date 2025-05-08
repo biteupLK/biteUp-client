@@ -4,7 +4,7 @@ import Keycloak from "keycloak-js";
 
 // Singleton Keycloak instance
 const keycloakInstance = new Keycloak({
-  url: "http://localhost:8181", // Replace with your Keycloak URL
+  url: "http://localhost:8080", // Replace with your Keycloak URL
   realm: "biteup-realm",
   clientId: "biteup-client",
 });

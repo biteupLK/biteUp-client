@@ -291,7 +291,7 @@ const DeliveryPerson = () => {
                       secondary={
                         <>
                           <Typography component="span" variant="body2" display="block">
-                            Order ID: {order?.id?.slice(0, 8)}...
+                            Order ID: {order?.id}
                           </Typography>
                           <Typography component="span" variant="body2">
                             Customer: {order?.data?.object?.members?.billing_details?.members?.name?.value}
