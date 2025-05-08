@@ -31,6 +31,7 @@ import Navbar from "../../components/layOuts/Navbar";
 import bikerider from "../../assets/homepage/homepageImgwithcricle.png";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRestaurantData } from "../../api/restaurantApi";
+import { useNavigate } from "react-router-dom";
 
 const Loader = () => {
   return <Loaders />;
@@ -70,6 +71,7 @@ const Home: React.FC = () => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
+  const navigate = useNavigate();
 
   const { data: restaurantData, isLoading } = useQuery({
     queryKey: ["restaurant"],
@@ -246,7 +248,7 @@ const Home: React.FC = () => {
                         justifyContent: { xs: "center", md: "flex-start" },
                       }}
                     >
-                      {["Order Now", "Check Process"].map((text, index) => (
+                      {["Order Now", "Check Orders"].map((text, index) => (
                         <motion.button
                           key={text}
                           whileHover={{
@@ -260,6 +262,9 @@ const Home: React.FC = () => {
                             duration: 0.5,
                             delay: index * 0.2 + 1.0,
                           }}
+                          onClick={() =>
+                            navigate(index === 0 ? "/foods" : "/myorders")
+                          }
                           style={{
                             padding: "12px 24px",
                             borderRadius: 8,

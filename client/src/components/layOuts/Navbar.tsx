@@ -41,7 +41,7 @@ import logo from "../../assets/logo/biteUpLogo.png";
 import getUserDetails from "../../customHooks/extractPayload";
 
 import NavigationButtons from "../NavigationButtons"; // Import your NavigationButtons component
-import { ChevronRight } from "@mui/icons-material";
+import { ChevronRight, ShoppingBagRounded } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCartItems } from "../../api/cartApi";
 
