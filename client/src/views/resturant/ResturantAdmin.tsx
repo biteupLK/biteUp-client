@@ -2,10 +2,6 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import MenuList from "@mui/material/MenuList";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
@@ -13,12 +9,6 @@ import { createTheme } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
 import { AppProvider } from "@toolpad/core/AppProvider";
 import {
   DashboardLayout,
@@ -37,7 +27,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Dashboard from "./Dashboard";
 import Orders from "./Orders";
 import AddMenuItem from "./MenuManager";
-import { FoodBankSharp, LocalMall, Storefront } from "@mui/icons-material";
+import { FoodBankSharp, LocalMall } from "@mui/icons-material";
 
 import getUserDetails from "../../customHooks/extractPayload";
 import { Link, useNavigate } from "react-router-dom";

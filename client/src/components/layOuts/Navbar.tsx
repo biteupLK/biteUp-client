@@ -30,18 +30,19 @@ import HomeIcon from "@mui/icons-material/Home";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { IoFastFood } from "react-icons/io5";
 import LoginIcon from "@mui/icons-material/Login";
-import { FaStore, FaUserLarge } from "react-icons/fa6";
+import { FaBicycle, FaBox, FaStore, FaUserLarge } from "react-icons/fa6";
 import { TiThMenu } from "react-icons/ti";
 import useAuth from "../../customHooks/keycloak";
 
-import { checkRestaurantEmail } from "../../api/restaurantApi"; // Import your API function here
+import { checkRestaurantEmail } from "../../api/restaurantApi";
+import { checkDeliveryEmail } from "../../api/deliveryApi";
 
 // Import your logo here
 import logo from "../../assets/logo/biteUpLogo.png";
 import getUserDetails from "../../customHooks/extractPayload";
 
 import NavigationButtons from "../NavigationButtons"; // Import your NavigationButtons component
-import { ChevronRight, ShoppingBagRounded } from "@mui/icons-material";
+import { ChevronRight } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCartItems } from "../../api/cartApi";
 
@@ -168,7 +169,7 @@ const Navbar: React.FC = () => {
           </ListItemButton>
         </ListItem>
 
-        {getUserDetails()?.role === "ResAdmin" && (
+        {getUserDetails()?.role === "Delivery" && (
           <ListItem disablePadding>
             <ListItemButton
               onClick={async () => {
@@ -186,9 +187,9 @@ const Navbar: React.FC = () => {
 
                   const restaurantExists = await checkRestaurantEmail(email);
                   if (restaurantExists) {
-                    handleNavigation("/restaurantAdmin", "Dashboard");
+                    handleNavigation("/deliveryForm", "Dashboard");
                   } else {
-                    handleNavigation("/restaurantForm", "Login");
+                    handleNavigation("/delivery", "Login");
                   }
                 } catch (error) {
                   console.error("Error checking restaurant:", error);
@@ -197,7 +198,7 @@ const Navbar: React.FC = () => {
                   setLoading(false);
                 }
               }}
-              selected={activePage === "My Restaurant"}
+              selected={activePage === "My Delivery"}
               sx={{
                 transition: "all 0.3s ease",
                 "&.Mui-selected": {
@@ -214,7 +215,7 @@ const Navbar: React.FC = () => {
               <ListItemIcon>
                 <FaStore />
               </ListItemIcon>
-              <ListItemText primary="My Restaurant" />
+              <ListItemText primary="My Delivery" />
             </ListItemButton>
           </ListItem>
         )}
@@ -259,9 +260,11 @@ const Navbar: React.FC = () => {
             />
           </motion.div>
 
-          <Box sx={{
-            ml:20
-          }}>
+          <Box
+            sx={{
+              ml: 20,
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -474,7 +477,7 @@ const Navbar: React.FC = () => {
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <FaUserLarge
-                          fontSize="small"
+                          fontSize="medium"
                           className="menu-item-icon"
                         />
                       </ListItemIcon>
@@ -550,11 +553,84 @@ const Navbar: React.FC = () => {
                       >
                         <ListItemIcon sx={{ minWidth: 36 }}>
                           <FaStore
-                            fontSize="small"
+                            fontSize="medium"
                             className="menu-item-icon"
                           />
                         </ListItemIcon>
                         <Typography variant="body1">My Restaurant</Typography>
+                        <Box
+                          className="menu-item-arrow"
+                          sx={{
+                            ml: "auto",
+                            opacity: 0,
+                            transform: "translateX(-4px)",
+                            transition: "all 0.25s ease-out",
+                            color: "text.secondary",
+                          }}
+                        >
+                          <ChevronRight fontSize="small" />
+                        </Box>
+                      </MenuItem>
+                    )}
+                    {/* Delivery Item */}
+                    {getUserDetails()?.role === "Delivery" && (
+                      <MenuItem
+                        onClick={async () => {
+                          try {
+                            handleMenuClose();
+
+                            const userDetails = getUserDetails();
+                            const email = userDetails?.email;
+
+                            if (!email) {
+                              console.error("No user email found.");
+                              handleNavigation("/", "Login");
+                              return;
+                            }
+
+                            const deliveryExists =
+                              await checkDeliveryEmail(email);
+
+                            if (deliveryExists) {
+                              handleNavigation("/delivery", "Dashboard");
+                            } else {
+                              handleNavigation(
+                                "/deliveryForm",
+                                "Setup Restaurant"
+                              );
+                            }
+                          } catch (error) {
+                            console.error(
+                              "Error checking restaurant for email:",
+                              error
+                            );
+                            handleNavigation("/", "Login");
+                          }
+                        }}
+                        sx={{
+                          borderRadius: "16px",
+                          mx: 1,
+                          my: 0.5,
+                          py: 1.5,
+                          px: 2,
+                          transition: "all 0.25s ease-out",
+                          "&:hover": {
+                            bgcolor: "action.hover",
+                            "& .menu-item-icon": {
+                              transform: "scale(1.1)",
+                              color: "primary.main",
+                            },
+                            "& .menu-item-arrow": {
+                              opacity: 1,
+                              transform: "translateX(0)",
+                            },
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <FaBox fontSize="medium" className="menu-item-icon" />
+                        </ListItemIcon>
+                        <Typography variant="body1">My Delivery</Typography>
                         <Box
                           className="menu-item-arrow"
                           sx={{
