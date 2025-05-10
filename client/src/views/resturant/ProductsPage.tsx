@@ -38,9 +38,9 @@ const ProductsPage = () => {
   const restaurantEmail = userDetails?.email;
 
   const cardWidth = 350;
-  const cardHeight = 300;
+  const cardHeight = 330;
   const imageHeight = 180;
-  const contentHeight = 120;
+  const contentHeight = 163;
 
   const queryClient = useQueryClient();
 
@@ -301,7 +301,7 @@ const ProductsPage = () => {
               {product.description}
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600, color: "primary.main" }}>
-              ${product.price.toFixed(2)}
+              ${product.price.toFixed(2)}   
             </Typography>
           </CardContent>
 

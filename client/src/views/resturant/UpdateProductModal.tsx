@@ -280,7 +280,7 @@ const UpdateProductModal = ({
                       <LocalOfferIcon color="primary" />
                     </InputAdornment>
                   ),
-                  endAdornment: <InputAdornment position="end">$</InputAdornment>,
+                  endAdornment: <InputAdornment position="end">RS</InputAdornment>,
                 }}
               />
 
