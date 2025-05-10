@@ -17,6 +17,7 @@ import PaidOrders from "./views/myOrders/MyOrders";
 import DeliveryPerson from "./views/delivery/DeliveryPerson";
 import RestaurantProfileUpdate from "./views/resturant/RestaurantProfileUpdate";
 import DeliveryForm from "./views/delivery/DeliveryForm";
+import AboutUs from "./views/aboutUs/AboutUs";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
@@ -79,6 +80,7 @@ const AppRoutes = () => {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/myOrders" element={<PaidOrders />} />
       <Route path="/delivery" element={<DeliveryPerson />} />
+      <Route path="/about" element={<AboutUs />} />
 
       <Route element={<UserRestaurantAdmin />}>
         <Route path="/restaurantForm" element={<RestaurantForm />} />
@@ -99,7 +101,7 @@ const AppRoutes = () => {
       </Route>
 
       <Route element={<DeliveryProtectedRoute />}>
-        <Route path="/deliveryForm" element={<DeliveryForm/>} />
+        <Route path="/deliveryForm" element={<DeliveryForm />} />
       </Route>
     </Routes>
   );
