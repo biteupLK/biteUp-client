@@ -37,11 +37,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Dashboard from "./Dashboard";
 import Orders from "./Orders";
 import AddMenuItem from "./MenuManager";
-import { FoodBankSharp } from "@mui/icons-material";
+import { FoodBankSharp, LocalMall, Storefront } from "@mui/icons-material";
 
 import getUserDetails from "../../customHooks/extractPayload";
 import { Link, useNavigate } from "react-router-dom";
 import { getRestaurantImg } from "../../api/restaurantApi";
+import ProductsPage from "./ProductsPage";
 
 function AppTitle() {
   return (
@@ -80,14 +81,19 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: "orders",
+    segment: "orders",                     //orders
     title: "Orders",
     icon: <ShoppingCartIcon />,
   },
   {
-    segment: "MenuManager",
+    segment: "MenuManager",                 //menu
     title: "Menu Manager",
     icon: <FoodBankSharp />,
+  },
+  {
+    segment: "Products",                     //all product
+    title: "Products",
+    icon: <LocalMall />,
   },
 ];
 
@@ -139,6 +145,7 @@ function RestaurantPageContent({ pathname }: { pathname: string }) {
     return <Loader />;
   }
 
+  //create route path
   switch (pathname) {
     case "/dashboard":
       return <Dashboard />;
@@ -146,6 +153,8 @@ function RestaurantPageContent({ pathname }: { pathname: string }) {
       return <Orders />;
     case "/MenuManager":
       return <AddMenuItem />;
+    case "/Products":
+      return <ProductsPage />;
     default:
       return (
         <Box
