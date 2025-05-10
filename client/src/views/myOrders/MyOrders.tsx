@@ -246,7 +246,8 @@ const PaidOrders = () => {
                           fontWeight="bold"
                           color="primary"
                         >
-                          Rs. {total}
+                          Rs. {(Number(total) / 100).toFixed(2)}
+
                         </Typography>
                         <Divider sx={{ my: 1 }} />
                         <Stack

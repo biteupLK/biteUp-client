@@ -234,7 +234,8 @@ const PaidOrders = () => {
                         Order Total
                       </Typography>
                       <Typography variant="h6" fontWeight="bold" color="primary">
-                        Rs. {total}
+                        Rs. {(Number(total) / 100).toFixed(2)}
+
                       </Typography>
 
                       <Button 
