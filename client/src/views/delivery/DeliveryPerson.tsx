@@ -1,16 +1,20 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  List, 
-  ListItem, 
-  ListItemText, 
+import {
+  Box,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
   Chip,
   Button,
   CircularProgress,
-  Alert
+  Alert,
+  Card,
+  CardContent,
+  Stack,
+  Divider,
 } from "@mui/material";
 import { Refresh, LocationOn, DirectionsBike } from "@mui/icons-material";
 
@@ -22,14 +26,18 @@ declare global {
 }
 
 const DeliveryPerson = () => {
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const [orders, setOrders] = useState<any[]>([]);
   const [socket, setSocket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [watchId, setWatchId] = useState<number | null>(null);
   const [tracking, setTracking] = useState(false);
-  const [locationHistory, setLocationHistory] = useState<Array<{ lat: number; lng: number }>>([]);
+  const [locationHistory, setLocationHistory] = useState<
+    Array<{ lat: number; lng: number }>
+  >([]);
   const mapRef = useRef<any>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
@@ -41,7 +49,7 @@ const DeliveryPerson = () => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
-    
+
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
@@ -54,7 +62,9 @@ const DeliveryPerson = () => {
 
     newSocket.on("new-order", (order: any) => {
       setOrders((prev) => [...prev, order]);
-      alert(`📦 New Order Received! ${order?.data?.object?.members?.metadata?.members?.foodName?.value}`);
+      alert(
+        `📦 New Order Received! ${order?.data?.object?.members?.metadata?.members?.foodName?.value}`
+      );
     });
 
     return () => {
@@ -135,7 +145,7 @@ const DeliveryPerson = () => {
       markerRef.current.setPosition(location);
 
       // Add to location history
-      setLocationHistory(prev => [...prev, location]);
+      setLocationHistory((prev) => [...prev, location]);
     }
   }, [location]);
 
@@ -149,7 +159,7 @@ const DeliveryPerson = () => {
           const { latitude, longitude } = position.coords;
           const loc = { lat: latitude, lng: longitude };
           setLocation(loc);
-          
+
           // Send to server
           if (socket) {
             socket.emit("send-location", loc);
@@ -164,10 +174,10 @@ const DeliveryPerson = () => {
           setError(`Geolocation error: ${error.message}`);
           console.error("Geolocation error:", error);
         },
-        { 
+        {
           enableHighAccuracy: true,
           maximumAge: 10000,
-          timeout: 5000
+          timeout: 5000,
         }
       );
       setWatchId(id);
@@ -199,7 +209,7 @@ const DeliveryPerson = () => {
           const { latitude, longitude } = position.coords;
           const loc = { lat: latitude, lng: longitude };
           setLocation(loc);
-          
+
           if (socket) {
             socket.emit("send-location", loc);
           }
@@ -215,16 +225,20 @@ const DeliveryPerson = () => {
     <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
-          <DirectionsBike sx={{ verticalAlign: 'middle', mr: 1 }} />
+          <DirectionsBike sx={{ verticalAlign: "middle", mr: 1 }} />
           Delivery Dashboard
         </Typography>
-        
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Box>
             {location && (
               <Typography variant="body1">
-                <LocationOn color="primary" sx={{ verticalAlign: 'middle', mr: 0.5 }} />
-                Current Location: {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                <LocationOn
+                  color="primary"
+                  sx={{ verticalAlign: "middle", mr: 0.5 }}
+                />
+                Current Location: {location.lat.toFixed(6)},{" "}
+                {location.lng.toFixed(6)}
               </Typography>
             )}
             <Chip
@@ -233,7 +247,7 @@ const DeliveryPerson = () => {
               sx={{ mt: 1 }}
             />
           </Box>
-          
+
           <Box>
             <Button
               variant="contained"
@@ -261,17 +275,30 @@ const DeliveryPerson = () => {
         )}
       </Paper>
 
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 3,
+        }}
+      >
         <Box sx={{ flex: 1 }}>
           <Paper elevation={3} sx={{ p: 2, mb: 3, height: 400 }}>
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
                 <CircularProgress />
               </Box>
             ) : (
-              <div 
-                ref={mapRef} 
-                style={{ width: '100%', height: '100%', borderRadius: 4 }}
+              <div
+                ref={mapRef}
+                style={{ width: "100%", height: "100%", borderRadius: 4 }}
               />
             )}
           </Paper>
@@ -279,32 +306,122 @@ const DeliveryPerson = () => {
 
         <Box sx={{ flex: 1 }}>
           {orders.length > 0 ? (
-            <Paper elevation={3} sx={{ p: 2, height: 400, overflow: 'auto' }}>
+            <Paper elevation={3} sx={{ p: 2, height: 400, overflow: "auto" }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Current Orders ({orders.length})
               </Typography>
               <List>
                 {orders.map((order, index) => (
-                  <ListItem key={index} divider>
-                    <ListItemText
-                      primary={order?.data?.object?.members?.metadata?.members?.foodName?.value || "Unknown Order"}
-                      secondary={
-                        <>
-                          <Typography component="span" variant="body2" display="block">
-                            Order ID: {order?.id}
+                  <Card key={index} sx={{ mb: 2, boxShadow: 2 }}>
+                    <CardContent>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mb={1}
+                      >
+                        <Typography
+                          variant="h6"
+                          component="div"
+                          sx={{ fontWeight: "bold" }}
+                        >
+                          {
+                            order?.data?.object?.members?.metadata?.members
+                              ?.foodName?.value
+                          } <br></br>
+                           Restaurant{" "} 
+                          {
+                            order?.data?.object?.members?.metadata?.members
+                              ?.restaurantEmail?.value
+                          }
+                        </Typography>
+                        <Chip
+                          label={`Order #${order?.id}`}
+                          color="primary"
+                          size="small"
+                          sx={{ fontWeight: "bold" }}
+                        />
+                      </Stack>
+
+                      <Divider sx={{ my: 1 }} />
+
+                      <Stack spacing={1}>
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Customer Details
                           </Typography>
-                          <Typography component="span" variant="body2">
-                            Customer: {order?.data?.object?.members?.billing_details?.members?.name?.value}
+                          <Stack spacing={0.5} sx={{ pl: 1 }}>
+                            <Typography variant="body2">
+                              <strong>Name:</strong>{" "}
+                              {
+                                order?.data?.object?.members?.billing_details
+                                  ?.members?.name?.value
+                              }
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>Phone:</strong>{" "}
+                              {
+                                order?.data?.object?.members?.metadata?.members
+                                  ?.phone?.value
+                              }
+                            </Typography>
+                          </Stack>
+                        </Box>
+
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Delivery Address
                           </Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
+                          <Stack spacing={0.5} sx={{ pl: 1 }}>
+                            <Typography variant="body2">
+                              {
+                                order?.data?.object?.members?.billing_details
+                                  ?.members?.address?.members?.line1?.value
+                              }
+                            </Typography>
+                            {order?.data?.object?.members?.billing_details
+                              ?.members?.address?.members?.line2?.value && (
+                              <Typography variant="body2">
+                                {
+                                  order?.data?.object?.members?.billing_details
+                                    ?.members?.address?.members?.line2?.value
+                                }
+                              </Typography>
+                            )}
+                            <Typography variant="body2">
+                              {
+                                order?.data?.object?.members?.billing_details
+                                  ?.members?.address?.members?.city?.value
+                              }
+                            </Typography>
+                          </Stack>
+                        </Box>
+                      </Stack>
+                    </CardContent>
+                  </Card>
                 ))}
               </List>
             </Paper>
           ) : (
-            <Paper elevation={3} sx={{ p: 3, textAlign: "center", height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                textAlign: "center",
+                height: 400,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Typography variant="body1">No orders assigned yet</Typography>
             </Paper>
           )}
