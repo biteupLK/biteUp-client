@@ -16,7 +16,7 @@ import CartPage from "./views/cartPage/CartPage";
 import PaidOrders from "./views/myOrders/MyOrders";
 import DeliveryPerson from "./views/delivery/DeliveryPerson";
 import RestaurantProfileUpdate from "./views/resturant/RestaurantProfileUpdate";
-import DeliveryForm from "./views/delivery/deliveryForm";
+import DeliveryForm from "./views/delivery/DeliveryForm";
 
 const HomePage = React.lazy(() => import("./views/homePage/HomePage"));
 
