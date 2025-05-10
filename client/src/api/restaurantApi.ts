@@ -1,6 +1,6 @@
 import axios from "axios";
 import { z } from "zod";
-import { StorageFile, StorageFileSchema } from "../utils/StorageFiles.utils";
+import { StorageFile } from "../utils/StorageFiles.utils";
 
 export const RestaurantSchema = z.object({
   id: z.string(),
