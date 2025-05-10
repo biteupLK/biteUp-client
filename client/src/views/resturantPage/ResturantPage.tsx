@@ -105,20 +105,32 @@ const customTheme = createTheme({
 const RestaurantCardSkeleton = () => {
   return (
     <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Skeleton 
-        variant="rectangular" 
-        height={180} 
-        animation="wave" 
-        sx={{ 
-          borderRadius: '12px 12px 0 0' 
-        }} 
+      <Skeleton
+        variant="rectangular"
+        height={180}
+        animation="wave"
+        sx={{
+          borderRadius: "12px 12px 0 0",
+        }}
       />
       <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
         <Skeleton variant="text" height={28} width="80%" animation="wave" />
-        <Skeleton variant="text" height={20} width="60%" animation="wave" sx={{ mb: 1.5 }} />
+        <Skeleton
+          variant="text"
+          height={20}
+          width="60%"
+          animation="wave"
+          sx={{ mb: 1.5 }}
+        />
         <Skeleton variant="text" height={16} width="100%" animation="wave" />
         <Skeleton variant="text" height={16} width="90%" animation="wave" />
-        <Skeleton variant="text" height={16} width="80%" animation="wave" sx={{ mb: 1.5 }} />
+        <Skeleton
+          variant="text"
+          height={16}
+          width="80%"
+          animation="wave"
+          sx={{ mb: 1.5 }}
+        />
         <Skeleton variant="text" height={16} width="70%" animation="wave" />
       </CardContent>
       <Box sx={{ p: 2.5, pt: 0 }}>
@@ -147,21 +159,27 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
       transition={{ duration: 0.3 }}
       whileHover={{ scale: 1.02 }}
     >
-      <Card sx={{ 
-        height: "100%", 
-        display: "flex", 
-        flexDirection: "column",
-        border: '1px solid rgba(0, 0, 0, 0.05)'
-      }}>
+      <Card
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+        }}
+      >
         {restaurant.logo ? (
           <CardMedia
             component="img"
             height={180}
-            image={URL.createObjectURL(restaurant.logo)}
+            image={
+              typeof restaurant.logo === "string"
+                ? restaurant.logo
+                : URL.createObjectURL(restaurant.logo)
+            }
             alt={restaurant.name}
-            sx={{ 
+            sx={{
               objectFit: "cover",
-              borderRadius: '12px 12px 0 0'
+              borderRadius: "12px 12px 0 0",
             }}
           />
         ) : (
@@ -173,13 +191,13 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
               alignItems: "center",
               justifyContent: "center",
               color: "white",
-              borderRadius: '12px 12px 0 0'
+              borderRadius: "12px 12px 0 0",
             }}
           >
             <RestaurantIcon sx={{ fontSize: 48, opacity: 0.9 }} />
           </Box>
         )}
-        
+
         <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
           <Typography
             gutterBottom
@@ -197,12 +215,12 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
               precision={0.5}
               size="small"
               readOnly
-              sx={{ 
-                color: "primary.main", 
+              sx={{
+                color: "primary.main",
                 mr: 1,
-                '& .MuiRating-icon': {
-                  fontSize: '1.1rem'
-                }
+                "& .MuiRating-icon": {
+                  fontSize: "1.1rem",
+                },
               }}
             />
             <Typography variant="body2" color="text.secondary">
@@ -218,46 +236,46 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
               height: 60,
               overflow: "hidden",
               textOverflow: "ellipsis",
-              display: '-webkit-box',
+              display: "-webkit-box",
               WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              fontSize: '0.875rem'
+              WebkitBoxOrient: "vertical",
+              fontSize: "0.875rem",
             }}
           >
             {restaurant.description}
           </Typography>
 
-          <Box sx={{ 
-            display: "flex", 
-            alignItems: "flex-start",
-            mb: 1.5,
-            '& svg': {
-              fontSize: '1rem',
-              mt: 0.25,
-              mr: 1,
-              color: 'text.secondary'
-            }
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              mb: 1.5,
+              "& svg": {
+                fontSize: "1rem",
+                mt: 0.25,
+                mr: 1,
+                color: "text.secondary",
+              },
+            }}
+          >
             <LocationOnIcon />
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ flex: 1 }}
-            >
+            <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
               {restaurant.address}
             </Typography>
           </Box>
 
-          <Box sx={{ 
-            display: "flex", 
-            alignItems: "flex-start",
-            '& svg': {
-              fontSize: '1rem',
-              mt: 0.25,
-              mr: 1,
-              color: 'text.secondary'
-            }
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              "& svg": {
+                fontSize: "1rem",
+                mt: 0.25,
+                mr: 1,
+                color: "text.secondary",
+              },
+            }}
+          >
             <PhoneIcon />
             <Typography variant="body2" color="text.secondary">
               {restaurant.phoneNumber}
@@ -274,7 +292,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
             size="medium"
             sx={{
               fontWeight: 600,
-              letterSpacing: '0.5px'
+              letterSpacing: "0.5px",
             }}
           >
             View Menu
@@ -288,10 +306,12 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 const RestaurantPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [restaurants, setRestaurants] = useState<RestaurantSchema[]>([]);
-  const [filteredRestaurants, setFilteredRestaurants] = useState<RestaurantSchema[]>([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState<
+    RestaurantSchema[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -315,7 +335,9 @@ const RestaurantPage: React.FC = () => {
     const results = restaurants.filter(
       (restaurant) =>
         restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        restaurant.description
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         restaurant.address.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredRestaurants(results);
@@ -334,7 +356,7 @@ const RestaurantPage: React.FC = () => {
       >
         <Container maxWidth="lg">
           {/* Modern header section */}
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Box sx={{ mb: 4, textAlign: "center" }}>
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -343,10 +365,10 @@ const RestaurantPage: React.FC = () => {
               <Typography
                 variant="h4"
                 component="h1"
-                sx={{ 
+                sx={{
                   fontWeight: 700,
                   mb: 1.5,
-                  fontSize: isMobile ? '1.75rem' : '2.125rem'
+                  fontSize: isMobile ? "1.75rem" : "2.125rem",
                 }}
               >
                 Discover Local Restaurants
@@ -354,13 +376,14 @@ const RestaurantPage: React.FC = () => {
               <Typography
                 variant="body1"
                 color="text.secondary"
-                sx={{ 
+                sx={{
                   maxWidth: 600,
-                  mx: 'auto',
-                  fontSize: isMobile ? '0.875rem' : '0.9375rem'
+                  mx: "auto",
+                  fontSize: isMobile ? "0.875rem" : "0.9375rem",
                 }}
               >
-                Explore top-rated dining options near you with seamless ordering and delivery
+                Explore top-rated dining options near you with seamless ordering
+                and delivery
               </Typography>
             </motion.div>
           </Box>
@@ -385,10 +408,10 @@ const RestaurantPage: React.FC = () => {
                     </InputAdornment>
                   ),
                   sx: {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.05)',
-                    '& fieldset': { 
-                      border: 'none',
+                    bgcolor: "background.paper",
+                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+                    "& fieldset": {
+                      border: "none",
                     },
                   },
                 }}
@@ -398,32 +421,36 @@ const RestaurantPage: React.FC = () => {
 
           {/* Restaurant grid */}
           {isLoading ? (
-            <Box sx={{
-              display: 'grid',
-              gridTemplateColumns: { 
-                xs: '1fr', 
-                sm: 'repeat(2, 1fr)', 
-                md: 'repeat(3, 1fr)',
-                lg: 'repeat(4, 1fr)'
-              },
-              gap: 3
-            }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(3, 1fr)",
+                  lg: "repeat(4, 1fr)",
+                },
+                gap: 3,
+              }}
+            >
               {Array.from({ length: 8 }).map((_, i) => (
                 <RestaurantCardSkeleton key={i} />
               ))}
             </Box>
           ) : filteredRestaurants.length > 0 ? (
             <AnimatePresence>
-              <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: { 
-                  xs: '1fr', 
-                  sm: 'repeat(2, 1fr)', 
-                  md: 'repeat(3, 1fr)',
-                  lg: 'repeat(4, 1fr)'
-                },
-                gap: 3
-              }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(2, 1fr)",
+                    md: "repeat(3, 1fr)",
+                    lg: "repeat(4, 1fr)",
+                  },
+                  gap: 3,
+                }}
+              >
                 {filteredRestaurants.map((restaurant) => (
                   <motion.div
                     key={restaurant.id}
@@ -456,7 +483,7 @@ const RestaurantPage: React.FC = () => {
                   p: 4,
                   borderRadius: 3,
                   background: "rgba(255, 255, 255, 0.8)",
-                  border: '1px solid rgba(0, 0, 0, 0.05)'
+                  border: "1px solid rgba(0, 0, 0, 0.05)",
                 }}
               >
                 <Box
@@ -476,23 +503,27 @@ const RestaurantPage: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                   No restaurants found
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {searchTerm.trim()
                     ? `No results for "${searchTerm}"`
                     : "No restaurants available at the moment"}
                 </Typography>
                 {searchTerm.trim() && (
-                  <Chip 
-                    label="Clear search" 
-                    onClick={() => setSearchTerm('')} 
+                  <Chip
+                    label="Clear search"
+                    onClick={() => setSearchTerm("")}
                     color="primary"
                     variant="outlined"
-                    sx={{ 
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: 'primary.light',
-                        color: 'primary.contrastText'
-                      }
+                    sx={{
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "primary.light",
+                        color: "primary.contrastText",
+                      },
                     }}
                   />
                 )}

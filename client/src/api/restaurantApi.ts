@@ -1,11 +1,11 @@
 import axios from "axios";
 import { z } from "zod";
-import { StorageFileSchema } from "../utils/StorageFiles.utils";
+import { StorageFile, StorageFileSchema } from "../utils/StorageFiles.utils";
 
 export const RestaurantSchema = z.object({
   id: z.string(),
   restaurantName: z.string(),
-  adress: z.string(), 
+  adress: z.string(), // Note: Duplicate of 'address'? You might want to remove one
   quantity: z.string(),
   name: z.string(),
   address: z.string(),
@@ -15,10 +15,11 @@ export const RestaurantSchema = z.object({
   phoneNumber: z.string(),
   email: z.string().email(),
   description: z.string(),
-  image: z.array(z.union([z.instanceof(File), StorageFileSchema])).optional(),
+  image: z.array(z.union([z.instanceof(File), z.custom<StorageFile>()])).optional(),
   latitude: z.number().nullable(),
   longitude: z.number().nullable(),
   placeId: z.string().nullable(),
+  logo: z.union([z.instanceof(File), z.string()]).optional(), // Correct way to add optional logo
 });
 
 export type RestaurantSchema = z.infer<typeof RestaurantSchema>;
@@ -96,6 +97,7 @@ export async function updateRestaurant(
     latitude: data.latitude,
     longitude: data.longitude,
     placeId: data.placeId,
+    
   };
   
   formData.append("restaurant", JSON.stringify(restaurantData));
