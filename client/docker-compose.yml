@@ -1,0 +1,13 @@
+
+services:
+  web:
+    build: .
+    ports: 
+      - "5175:5175"  # Correct format is host:container
+    volumes:
+      - .:/app
+      - /app/node_modules  # This mounts node_modules as a volume so it doesn't get overwritten
+    working_dir: /app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run dev  # Start Vite dev server
