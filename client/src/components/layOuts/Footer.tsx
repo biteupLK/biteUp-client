@@ -2,7 +2,7 @@ import React from "react";
 import {
   Box,
   Container,
-  Grid,
+  Stack,
   Typography,
   Link,
   IconButton,
@@ -62,9 +62,13 @@ const Footer: React.FC = () => {
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={3}>
+        <Stack
+          direction={isMobile ? "column" : "row"}
+          spacing={4}
+          justifyContent="space-between"
+        >
           {/* Logo and Description */}
-          <Grid item xs={12} md={4}>
+          <Box flex={1}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <Box
                 component="img"
@@ -82,13 +86,13 @@ const Footer: React.FC = () => {
             <Typography variant="body2" sx={{ mb: 2, color: "text.secondary" }}>
               Your favorite restaurants delivered fast to your door.
             </Typography>
-            
-            {/* Social Media Icons - Compact */}
+
+            {/* Social Media Icons */}
             <Box sx={{ mb: 2 }}>
               <IconButton
                 size="small"
                 aria-label="facebook"
-                sx={{ 
+                sx={{
                   color: "text.secondary",
                   "&:hover": { color: "#1877F2" },
                 }}
@@ -98,7 +102,7 @@ const Footer: React.FC = () => {
               <IconButton
                 size="small"
                 aria-label="twitter"
-                sx={{ 
+                sx={{
                   color: "text.secondary",
                   "&:hover": { color: "#1DA1F2" },
                 }}
@@ -108,7 +112,7 @@ const Footer: React.FC = () => {
               <IconButton
                 size="small"
                 aria-label="instagram"
-                sx={{ 
+                sx={{
                   color: "text.secondary",
                   "&:hover": { color: "#E4405F" },
                 }}
@@ -116,66 +120,74 @@ const Footer: React.FC = () => {
                 <InstagramIcon fontSize="small" />
               </IconButton>
             </Box>
-          </Grid>
+          </Box>
 
-          {/* Footer Links - Compact */}
-          <Grid item xs={12} md={8}>
-            <Grid container spacing={2}>
-              {footerLinks.map((section, index) => (
-                <Grid item xs={6} sm={4} key={index}>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight="bold"
-                    sx={{ mb: 1 }}
+          {/* Footer Links */}
+          <Stack
+            direction={isMobile ? "column" : "row"}
+            spacing={4}
+            flex={2}
+          >
+            {footerLinks.map((section, index) => (
+              <Box key={index}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
+                  sx={{ mb: 1 }}
+                >
+                  {section.title}
+                </Typography>
+                {section.links.map((link, linkIndex) => (
+                  <Link
+                    href={link.url}
+                    key={linkIndex}
+                    underline="none"
+                    color="text.secondary"
+                    variant="body2"
+                    sx={{
+                      display: "block",
+                      mb: 1,
+                      "&:hover": { color: "primary.main" },
+                    }}
                   >
-                    {section.title}
-                  </Typography>
-                  {section.links.map((link, linkIndex) => (
-                    <Link
-                      href={link.url}
-                      key={linkIndex}
-                      underline="none"
-                      color="text.secondary"
-                      variant="body2"
-                      sx={{
-                        display: "block",
-                        mb: 1,
-                        "&:hover": { color: "primary.main" },
-                      }}
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
-                </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        </Grid>
+                    {link.name}
+                  </Link>
+                ))}
+              </Box>
+            ))}
+          </Stack>
+        </Stack>
 
         {/* Divider and Contact Info */}
         <Divider sx={{ my: 2 }} />
-        <Box sx={{ 
-          display: "flex", 
-          flexDirection: isMobile ? "column" : "row", 
-          justifyContent: "space-between",
-          alignItems: isMobile ? "flex-start" : "center",
-          gap: 1
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: "space-between",
+            alignItems: isMobile ? "flex-start" : "center",
+            gap: 1,
+          }}
+        >
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <PhoneIcon sx={{ mr: 1, fontSize: "1rem", color: "text.secondary" }} />
+              <PhoneIcon
+                sx={{ mr: 1, fontSize: "1rem", color: "text.secondary" }}
+              />
               <Typography variant="caption" color="text.secondary">
                 +94 (76) 4748263
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <EmailIcon sx={{ mr: 1, fontSize: "1rem", color: "text.secondary" }} />
+              <EmailIcon
+                sx={{ mr: 1, fontSize: "1rem", color: "text.secondary" }}
+              />
               <Typography variant="caption" color="text.secondary">
                 support@biteup.com
               </Typography>
             </Box>
           </Box>
-          
+
           <Typography variant="caption" color="text.secondary">
             © {new Date().getFullYear()} BiteUp. All rights reserved.
           </Typography>

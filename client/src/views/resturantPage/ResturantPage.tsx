@@ -3,7 +3,6 @@ import {
   Box,
   ThemeProvider,
   createTheme,
-  Stack,
   Card,
   CardMedia,
   CardContent,
@@ -287,7 +286,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           <Button
             variant="contained"
             fullWidth
-            href={`/restaurant/${restaurant.id}`}
+            // href={`/restaurant/${restaurant.id}`}
             disableElevation
             size="medium"
             sx={{
