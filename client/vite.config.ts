@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5175,
+    host: '0.0.0.0',
     strictPort: true,
     proxy: {
       '/ws': {
@@ -12,8 +13,11 @@ export default defineConfig({
         ws: true,
         changeOrigin: true
       }
-    }
-  },
+    },
+    watch:{
+      usePolling:true
+    },
+  }, 
   define: {
     global: {},
   },
